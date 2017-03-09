@@ -289,8 +289,8 @@ Manually using mongo CLI:
 $ mongo
 > show dbs
 > use rest-api
-> db.createCollection('pirates')
 > show collections
+> db.createCollection('pirates')
 > db.pirates.insert( { "name": "First Last", "vessel": "The Calico", "weapon": "Peg Leg" } )
 > db.pirates.find()
 ```
@@ -346,10 +346,6 @@ At your find all endpoint `http://localhost:3001/api/pirates`, copy one of the i
 
 e.g. `http://localhost:3001/api/pirates/58c0d373d6f9c124b7f768b5`
 
-###Postman
-
-Since modelling endpoints is a common task and is rendered difficult by the opaqueness of the http verbs most people use a utility such as [Postman](https://www.getpostman.com/). 
-
 ####Add a Pirate
 
 We used create() for our import function to add multiple documents to our Pirates Mongo collection. Our POST handler uses the same method to add a single Pirate to the collection. Once added, the response is the full new Pirate's JSON object.
@@ -369,7 +365,11 @@ Use cURL to POST to the add endpoint with the full Pirate JSON as the request bo
 $ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Jean Lafitte", "vessel": "Barataria Bay", "weapon":"curses"}' http://localhost:3001/api/pirates
 ```
 
-We will also create a new Pirate in Postman.
+###Postman
+
+Since modelling endpoints is a common task and is rendered difficult by the opaqueness of the http verbs most people use a utility such as [Postman](https://www.getpostman.com/). 
+
+We will create a new Pirate in Postman.
 
 ![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman2.png)
 
@@ -388,67 +388,13 @@ exports.delete = function (req, res) {
 };
 ```
 
-Restart, and check it out with:
+Check it out with:
 
 ```
 $ curl -i -X DELETE http://localhost:3001/pirates/5820d3584dc4674967d091e6
 ```
 
 Create and test a delete Pirate action in Postman.
-
-####Update a Pirate
-
-PUT HTTP actions in a REST API correlate to an Update method. The route for Update also uses an :id parameter.
-
-```js
-exports.update = function (req, res) {
-    const id = req.params.id;
-    const updates = req.body;
-
-    Pirate.update({ "_id": id }, req.body,
-        function (err, numberAffected) {
-            if (err) return console.log(err);
-            console.log('Updated %d pirates', numberAffected);
-            return res.sendStatus(202);
-        });
-};
-```
-
-Notice the updates variable storing the req.body. req.body is useful when you want to pass in larger chunks of data such as a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
-
-The model's update() takes three parameters:
-
-* JSON object of matching properties to look up the doc with to update
-* JSON object of just the properties to update
-* callback function that returns the number of documents updated
-
-###Curl
-
-PUT actions are difficult to test in the browser, so we use cURL in Terminal and Postman.
-
-We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
-
-```
-$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/5820ce6379cc204557b40a21
-```
-
-#AAARGH - this stopped working
-
-This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update. 
-
-Terminal will output a JSON object of the response to the cURL request and Updated 1 pirates from our callback function.
-
-Visit the same URL from the cURL request in the browser to see the changes.
-
-We'll use Postman to run through the process of editing a pirate above.
-
-Remember to set the body to `raw` and the `text` header to application/json
-
-post
-http://localhost:3001/api/pirates/
-{"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}
-
-![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman.png)
 
 ##Building a Front End for Our API
 
@@ -459,15 +405,15 @@ Add a layouts directory and into it `index.html`:
 <html>
 
 <head>
-	<title>AngularJS Pirates</title>
-	<script src="https://code.angularjs.org/1.6.2/angular.js"></script>
-	<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
-	<script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
-	<script src="/js/app.js"></script>
+    <title>AngularJS Pirates</title>
+    <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
+    <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
+    <script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
+    <script src="/js/app.js"></script>
 </head>
 
 <body>
-	<h1>test</h1>
+    <h1>test</h1>
 </body>
 </html>
 ```
@@ -513,16 +459,16 @@ Add a ngApp:
 <html ng-app='pirateApp'>
 
 <head>
-	<title>AngularJS Pirates</title>
-	<link rel="stylesheet" href="css/styles.css">
-	<script src="https://code.angularjs.org/1.6.2/angular.js"></script>
-	<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
-	<script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
-	<script src="/js/app.js"></script>
+    <title>AngularJS Pirates</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
+    <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
+    <script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
+    <script src="/js/app.js"></script>
 </head>
 
 <body>
-	<h1>test</h1>
+    <h1>test</h1>
 </body>
 </html>
 ```
@@ -543,13 +489,13 @@ angular.module('pirateApp', [])
 
 ```html
 <body ng-controller="PirateAppController">
-	<h1>Pirates</h1>
-	<ul>
-		<li ng-repeat="pirate in pirates">
-			{{ pirate.name }}
-			<span>X</span>
-		</li>
-	</ul>
+    <h1>Pirates</h1>
+    <ul>
+        <li ng-repeat="pirate in pirates">
+            {{ pirate.name }}
+            <span>X</span>
+        </li>
+    </ul>
 </body>
 ```
 
@@ -559,7 +505,7 @@ As a starting point reuse the array script. Recall the script from a previous le
 
 ```
 $scope.deletePirate = function(index) {
-	$scope.pirates.splice(index, 1);
+    $scope.pirates.splice(index, 1);
 }
 ```
 
@@ -567,16 +513,16 @@ Wire up the deletePirate function:
 
 ```
 <ul>
-	<li ng-repeat="pirate in pirates">
-		{{ pirate.name }} | {{ pirate._id }}
-		<span ng-click="deletePirate(pirate._id)">X</span>
-	</li>
+    <li ng-repeat="pirate in pirates">
+        {{ pirate.name }} | {{ pirate._id }}
+        <span ng-click="deletePirate(pirate._id)">X</span>
+    </li>
 </ul>
 ```
 
 ```
 $scope.deletePirate = function(pid) {
-	$http.delete('/api/pirates/' + pid);
+    $http.delete('/api/pirates/' + pid);
 }
 ```
 
@@ -592,12 +538,105 @@ $scope.deletePirate = function (index, pid) {
 
 ```
 <ul>
-	<li ng-repeat="pirate in pirates">
-		{{ pirate.name }} {{ pirate._id }}
-		<span ng-click="deletePirate($index, pirate._id)">X</span>
-	</li>
+    <li ng-repeat="pirate in pirates">
+        {{ pirate.name }} {{ pirate._id }}
+        <span ng-click="deletePirate($index, pirate._id)">X</span>
+    </li>
 </ul>
 ```
+
+###Wire up the Animation
+
+```
+.odd {background: #bada55;}
+
+.fade.ng-enter {
+  animation: 2s appear;
+}
+.fade.ng-leave {
+  animation: 0.5s disappear;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(-200px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes disappear {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        font-size: 1.5rem;
+    }
+    75% {
+        color: green;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+```
+
+####Update a Pirate
+
+PUT HTTP actions in a REST API correlate to an Update method. The route for Update also uses an :id parameter.
+
+```js
+exports.update = function (req, res) {
+    const id = req.params.id;
+    const updates = req.body;
+
+    Pirate.update({ "_id": id }, req.body,
+        function (err, numberAffected) {
+            if (err) return console.log(err);
+            console.log('Updated %d pirates', numberAffected);
+            return res.sendStatus(202);
+        });
+};
+```
+
+Notice the updates variable storing the req.body. req.body is useful when you want to pass in larger chunks of data such as a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
+
+The model's update() takes three parameters:
+
+* JSON object of matching properties to look up the doc with to update
+* JSON object of just the properties to update
+* callback function that returns the number of documents updated
+
+###Curl
+
+PUT actions are difficult to test in the browser, so we use cURL in the Terminal or Postman.
+
+We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
+
+```
+$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/5820ce6379cc204557b40a21
+```
+
+#AAARGH - this stopped working
+
+This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update. 
+
+Terminal will output a JSON object of the response to the cURL request and Updated 1 pirates from our callback function.
+
+Visit the same URL from the cURL request in the browser to see the changes.
+
+We'll use Postman to run through the process of editing a pirate above.
+
+Remember to set the body to `raw` and the `text` header to application/json
+
+post
+http://localhost:3001/api/pirates/
+{"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}
+
+![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman.png)
+
 
 ##Notes
 
