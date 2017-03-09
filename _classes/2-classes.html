@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Classes</title>
+</head>
+<body>
+<script>
+  class Car {
+    constructor(model, make) {
+      this.model = model;
+      this.make = make;
+    }
+    drive() {
+      console.log(`Vroom vroom! My model is ${this.model}`)
+    }
+    stop() {
+      console.log(`Screech!`);
+    }
+    static info() {
+      console.log('A car is better than a truck');
+    }
+    get description() {
+      return `${this.model} is a ${this.make} type of car`;
+    }
+    set nicknames(value) {
+      this.nick = value.trim();
+    }
+    get nicknames() {
+      return this.nick.toUpperCase();
+    }
+  }
+
+  const expo = new Car('Expo', 'Ford');
+  const miata = new Car('Miata', 'Mazda');
+
+</script>
+</body>
+</html>
