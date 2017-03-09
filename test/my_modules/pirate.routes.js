@@ -5,6 +5,7 @@ var pirateRoutes = function(app) {
     app.post('/api/pirates', pirates.add);
     app.put('/api/pirates/:id', pirates.update);
     app.delete('/api/pirates/:id', pirates.delete);
+    app.get('/api/import', pirates.import);
 }
 
 module.exports = pirateRoutes;

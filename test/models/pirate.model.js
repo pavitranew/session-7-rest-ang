@@ -1,7 +1,5 @@
-var mongoose = require('/mongoose');
-// var Schema = mongoose.Schema;
-var Pirate = mongoose.model('Pirate');
-
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 var PirateSchema = new Schema({
     name: String,
@@ -9,6 +7,4 @@ var PirateSchema = new Schema({
     weapon: String
 });
 
-mongoose.model('Pirate', PirateSchema);
-
-// exports pirateModel
+module.exports = mongoose.model('Pirate', PirateSchema);

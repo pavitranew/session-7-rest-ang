@@ -2,75 +2,91 @@
 
 ##Homework
 
+##Building a Rest API
 
-In a new rest-api directory:
+Building a URL route scheme to map requests to app actions.
+
+In a new `rest-api` directory:
 
 `$ npm init`
 
+##Setup Tooling
+
+###1. Mongo
+
+[Download and install](https://www.mongodb.com/download-center) Mongodb. 
+
+For [MacOS](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
+
+Create a `/data/db/` directory and run `mongod` (in another Terminal tab) if it's not running already. 
+
+If you need help setting the permissions on the db folder [see this post](http://stackoverflow.com/questions/28987347/setting-read-write-permissions-on-mongodb-folder).
+
+###2. Mongoose.js
+
+A [Mongo Driver](http://mongoosejs.com) to model your application data.
+
+Use NPM to install this dependency and update your package.json file.
+
+`npm install mongoose --save-dev`
+
+[Quickstart guide](http://mongoosejs.com/docs/) for Mongoose.
+
+###3. Body Parser
+
+[Body Parser](https://www.npmjs.com/package/body-parser) parses and places incoming requests in a `req.body` property so our handlers can use them.
+
+`npm install body-parser --save-dev`
+
+###4. Nodemon
+
+Install nodemon globally:
+
+`sudo npm install -g nodemon`
+
+or locally
+
+`sudo npm install --save-dev nodemon`
+
+###5. Express
+
 `$ npm install --save express`
 
-Create server.js for express:
+Create index.js for express:
 
 ```
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser')
 
-app.get('/', function(req, res) {
-  res.send('Ahoy\n');
+var mongoose = require('mongoose');
+var mongoUri = 'mongodb://localhost/rest-api';
+mongoose.connect(mongoUri);
+
+app.get('/', function (req, res) {
+    res.send('Ahoy there\n');
+    console.dir(res);
 });
 
 app.listen(3001);
 console.log('Server running at http://localhost:3001/');
 ```
 
-###Rest API
-* A URL route schema to map requests to app actions
-* With a Controller to handle each action
-* Data to respond with
-* Place to store the data
-* An interface to access and change data
-
-###Routes
-
-Predefined URL paths your API responds to. Think of each Route as listening to three parts:
-
-* A specific HTTP Action
-* A specific URL path
-* A handler method
+##API Routes
 
 ###GET
 
-This example of routing handles all GET Requests. The URL path is the root of the site, the handling method is an anonymous function, and the response plain text:
+app.get is our test route to make sure everything is running correctly.
 
-Sample: 
+The URL path is the root of the site, the handling method is an anonymous function, and the response is plain text.
 
-```js
-app.get('/', function(req, res) {
-    res.send('Return JSON or HTML View');
-});
-```
-A peak inside the response:
+Run the app using `nodemon index.js` and make a change to res.send in server.js. Note the app restarts. Refresh the browser and note the res (response) object being dumped into the console.
 
-```js
-app.get('/', function (req, res) {
-    res.send('Ahoy there\n');
-    console.dir(res);
-});
-```
+(Keep an eye on the nodemon process during this exercise to see if it is hanging.)
 
-Note that the server needs to be restarted in order for us to see the results. 
+###URL Parameters
 
-Install nodemon:
-
-`sudo npm install -g nodemon`
-
-`sudo npm install --save-dev nodemon`
-
-Run the app using `nodemon server.js` and make a change to res.send in server.js. Note the app restarts. Refresh the browser and note the res (response) object being dumped into the console.
-
-You wil need to keep an eye on the nodemon process during this exercise to see if it is hanging.
-
-###GET Requests
+Add a second route:
 
 ```
 app.get('/pirate/:name', function(req, res) {
@@ -78,31 +94,30 @@ app.get('/pirate/:name', function(req, res) {
 });
 ```
 
-And run `http://localhost:3001/pirate/barney` noting the console's output.
+And run `http://localhost:3001/pirate/matt` noting the console's output.
 
-Edit:
 
-```
-app.get('/pirate/:name', function(req, res) {
-   res.send('{"id": 1,"name":"Matt", "vessel":"HMS Brawler"}');
-});
-```
+###Other Routes and Modules
 
-You can see the json in the view.
+Predefined URL paths your API responds to. Think of each Route as listening to three parts:
 
-###Routes
+* A specific HTTP Action
+* A specific URL path
+* A handler method
 
-Add routes.js to /app:
+Add routes.js to `/my_modules/pirate.routes.js`. (Note: many use src instead of my_modules by convention.)
 
 ```js
-module.exports = function (app) {
-    var pirates = require('./controllers/pirates');
+var pirateRoutes = function(app) {
+    var pirates = require('../controllers/pirate.controller');
     app.get('/api/pirates', pirates.findAll);
     app.get('/api/pirates/:id', pirates.findById);
     app.post('/api/pirates', pirates.add);
     app.put('/api/pirates/:id', pirates.update);
     app.delete('/api/pirates/:id', pirates.delete);
 }
+
+module.exports = pirateRoutes;
 ```
 
 Note: `module.exports` is the object that's returned as the result of a require call.
@@ -115,7 +130,7 @@ Note the require statement. We'll create a pirates controller and placed all our
 
 Create a folder called controllers at the top level. 
 
-Create a new file inside of that called pirates.js. We'll add each request handling method for pirates data to this file one by one. For now add these placeholders to pirates.js so we can restart the server without errors:
+Create a new file inside of that called `pirate.controllers.js`. We'll add each request handling method for pirates data to this file one by one. For now add these placeholders to pirates.js so we can restart the server without errors:
 
 ```js
 exports.findAll = function () { };
@@ -125,7 +140,9 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
-Update findAll's definition in the controllers:
+Check if its working. 
+
+Update findAll's definition in the controllers to a json snippet:
 
 ```js
 exports.findAll = function(req, res){
@@ -143,7 +160,8 @@ Update server.js to require our routes file. The .js file extension can be omitt
 ```js
 var express = require('express');
 ...
-require('./routes')(app);
+var routes = require('./my_modules/pirate.routes');
+var appRoutes = routes(app);
 
 app.listen...
 ```
@@ -151,57 +169,37 @@ app.listen...
 Navigate to `localhost:3001/api/pirates`
 
 
-###Mongo
-
-[Download and install](https://www.mongodb.com/download-center) Mongodb. 
-
-For [MacOS](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
-
-Create a `/data/db/` directory and run `mongod` (in another Terminal tab) if it's not running already. 
-
-If you need help setting the permissions on the db folder [see this post](http://stackoverflow.com/questions/28987347/setting-read-write-permissions-on-mongodb-folder).
-
-###Mongoose.js
-
-A [Mongo Driver](http://mongoosejs.com) to model your application data.
-
-Use NPM to install this dependency and update your package.json file.
-
-`npm install mongoose --save-dev`
-
-[Quickstart guide](http://mongoosejs.com/docs/) for Mongoose.
-
-###Body Parser
-
-[Body Parser](https://www.npmjs.com/package/body-parser) parses and places incoming requests in a `req.body` property so our handlers can use them.
-
-`npm install body-parser --save-dev`
-
-
 ###Update server.js:
 
 ```js
 var express = require('express');
-var mongoose = require('mongoose');
-// var fs = require('fs');
 var app = express();
 var bodyParser = require('body-parser')
-var mongoUri = 'mongodb://localhost/rest-api';
-var db = mongoose.connection;
 
+var mongoose = require('mongoose');
+var mongoUri = 'mongodb://localhost/rest-api';
 mongoose.connect(mongoUri);
 
-db.on('error', function () {
-    throw new Error('unable to connect to database at ' + mongoUri);
-});
 
-app.use(bodyParser.json())
+require('./models/pirate.model'); 
+var routes = require('./my_modules/pirate.routes');
+var appRoutes = routes(app);
 
-//require('./models/pirate');
-require('./routes')(app);
+app.use(bodyParser.json());
 
 app.listen(3001);
-console.log('Listening on port 3001...');
+console.log('Server running at http://localhost:3001/');
+
+app.get('/', function (req, res) {
+    res.send('Ahoy there\n');
+    console.dir(res);
+});
+
+app.get('/pirate/:name', function(req, res) {
+   console.log(req.params.name)
+});
+
+
 ```
 
 - We're requiring the Mongoose module which will communicate with Mongo for us. 
@@ -217,13 +215,13 @@ console.log('Listening on port 3001...');
 
 ###Define Data Models
 
-Create a new folder called models and add a new file pirate.js for our Pirate Model.
+Create a new folder called models and add a new file `pirate.model.js` for our Pirate Model.
 
 Require Mongoose into this file, and create a new Schema object:
 
 ```js
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 var PirateSchema = new Schema({
     name: String,
@@ -231,16 +229,16 @@ var PirateSchema = new Schema({
     weapon: String
 });
 
-mongoose.model('Pirate', PirateSchema);
+module.exports = mongoose.model('Pirate', PirateSchema);
 ```
 
 This schema makes sure we're getting and setting well-formed data to and from the Mongo collection. Our schema has three String properties which define a Pirate object. 
  
 The last line creates the Pirate model object, with built in Mongo interfacing methods. We'll refer to this Pirate object in other files.
  
-Ensure that `require('./models/pirate');` is in server.js
+Ensure that `var pirateModels = require('./models/pirate.model');` is in server.js
 
-Update controllers/pirates.js to require Mongoose, so we can create an instance of our Pirate model to work with. 
+Update `controllers/pirate.controllers.js` to require Mongoose, so we can create an instance of our Pirate model to work with. 
 
 And update findAll() to query Mongo with the find() data model method.
 
@@ -259,6 +257,8 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
+You may recognize find() as a mongo command. 
+
 Passing find() {} means we are not filtering data by any of its properties and so to return all of it. 
 
 Once Mongoose looks up the data it returns an error message and a result set. Use res.send() to return the raw results.
@@ -269,13 +269,13 @@ Restart the server and visit the API endpoint for all pirates `localhost:3001/ap
 
 ###Data
 
-Rather than use the Mongo command-line, let's import pirate data with our REST API. Add a new route endpoint to routes.js.
+Rather than use the Mongo command-line, let's import pirate data with our REST API. Add a new route endpoint to `pirate.routes.js`:
 
 ```js
 app.get('/api/import', pirates.import);
 ```
 
-Now define the import method in our Pirates Controller `controllers/pirates.js`:
+Now define the import method in our controller `controllers/pirate.controller.js`:
 
 ```js
 exports.import = function (req, res) {
@@ -297,11 +297,11 @@ This import method adds four documents from the JSON to a pirates collection. Th
 
 ###Returning Data
 
-Now visit your `/api/pirates` endpoint to view the new pirates data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private _id and internal __v version key. 
+Now visit the `http://localhost:3001/api/pirates` endpoint to view the new pirates data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private _id and internal __v version key. 
 
 ####Find By id
 
-Recall our route for getting a pirate by its id app.get('/pirates/:id', pirates.findById). 
+Recall our route for getting a pirate by its id: `app.get('/pirates/:id', pirates.findById)`. 
 
 Add the handler method:
 
@@ -314,11 +314,11 @@ exports.findById = function (req, res) {
 };
 ```
 
-This route's path uses a parameter pattern for id /pirates/:id which we can refer to in `req`. Pass this id to Mongoose to look up and return just one document. Restart the server.
+This route's path uses a parameter pattern for id `/pirates/:id` which we can refer to in `req`. Pass this id to Mongoose to look up and return just one document.
 
-At your find all endpoint, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one pirate's document.
+At your find all endpoint `http://localhost:3001/api/pirates`, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one pirate's document.
 
-e.g. `http://localhost:3001/api/pirates/581ca420f13de28c1776bbec`
+e.g. `http://localhost:3001/api/pirates/58c0d373d6f9c124b7f768b5`
 
 ####Update
 
@@ -348,17 +348,19 @@ The model's update() takes three parameters:
 
 ###Curl
 
-PUT actions are not easy to test in the browser, so we use cURL in Terminal after restarting the server.
+PUT actions are not easy to test in the browser, so we use cURL in Terminal.
 
 We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
 
 ```
-$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "HMS Brawler"}' http://localhost:3001/api/pirates/581ca420f13de28c1776bbec
+$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Vessel"}' http://localhost:3001/api/pirates/58c0d373d6f9c124b7f768b5
 ```
 
-This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update. Terminal will output a JSON object of the response to the cURL request and Updated 1 pirates from our callback function.
+This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update. 
 
-Visit this same URL from the cURL request in the browser to see the changes.
+Terminal will output a JSON object of the response to the cURL request and Updated 1 pirates from our callback function.
+
+Visit the same URL from the cURL request in the browser to see the changes.
 
 ###Postman
 
@@ -383,7 +385,7 @@ exports.add = function (req, res) {
 }
 ```
 
-Restart the server. Use cURL to POST to the add endpoint with the full Pirate JSON as the request body (making sure to check the URL port and path).
+Use cURL to POST to the add endpoint with the full Pirate JSON as the request body (making sure to check the URL port and path).
 
 ```
 $ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Jean Lafitte", "vessel": "Barataria Bay", "weapon":"curses"}' http://localhost:3001/api/pirates
