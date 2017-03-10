@@ -20,6 +20,6 @@ pirateApp.component('pirateList', {
 			.then( () => this.pirates.splice(index, 1))
 		}
 
-		this.reload =  () => $http.get('api/import/')
+		this.reload = () => $http.get('api/import/')
 	}	
 })
