@@ -12,65 +12,56 @@ In a new `rest-api` directory:
 
 `$ npm init`
 
+Create an npm script for nodemon (npm run server)
+
+```
+"scripts": {
+    "start": "nodemon app.js"
+},
+```
+
 ##Setup Tooling and npm Installs
 
 A joke:
 
 "I went to an all night JavaScript hackathon and by morning we finally had the build process configured!"
 
-###1. Mongo
+`sudo npm install --save-dev mongoose body-parser --save nodemon express`
 
+###1. Mongo
 Run `mongod` in another Terminal tab (if it's not running already). 
 
 If you need help setting the permissions on the db folder [see this post](http://stackoverflow.com/questions/28987347/setting-read-write-permissions-on-mongodb-folder).
 
+Test it:
+
+```
+$ mongo
+> show dbs
+```
+
 ###2. Mongoose.js
-
-A [Mongo Driver](http://mongoosejs.com) to model your application data.
-
-Use NPM to install this dependency and update your package.json file.
-
-`npm install mongoose --save-dev`
-
-[Quickstart guide](http://mongoosejs.com/docs/) for Mongoose.
+We'll use a [Mongo Driver](http://mongoosejs.com) to model application data. Here's a [quickstart guide](http://mongoosejs.com/docs/) for Mongoose.
 
 ###3. Body Parser
-
 [Body Parser](https://www.npmjs.com/package/body-parser) parses and places incoming requests in a `req.body` property so our handlers can use them.
 
-`npm install body-parser --save-dev`
-
 ###4. Nodemon
-
-Install nodemon globally:
-
-`sudo npm install -g nodemon`
-
-or locally
-
-`sudo npm install --save-dev nodemon`
+You've probably installed [Nodemon](https://nodemon.io) globally already.
 
 ###5. Express
 
-`$ npm install --save express`
+###app.js
 
-Create an npm script for nodemon (npm run server)
-
-```
-"scripts": {
-    "server": "nodemon index.js"
-},
-```
-
-Create index.js for express:
+Create app.js for express:
 
 ```
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser')
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser')
 
-var mongoose = require('mongoose');
-var mongoUri = 'mongodb://localhost/rest-api';
+const mongoose = require('mongoose');
+const mongoUri = 'mongodb://localhost/rest-api';
 mongoose.connect(mongoUri);
 
 app.get('/', function (req, res) {
@@ -90,9 +81,9 @@ app.get is our test route to make sure everything is running correctly.
 
 The URL path is the root of the site, the handling method is an anonymous function, and the response is plain text.
 
-Run the app using `npm run server`.
+Run the app using `npm run start`.
 
-Make a change to res.send in index.js to check that the server restarts. 
+Make a change to res.send in app.js to check that the server restarts. 
 
 Refresh the browser and note the res (response) object being dumped into the console.
 
@@ -108,7 +99,7 @@ app.get('/pirate/:name', function(req, res) {
 });
 ```
 
-And run `http://localhost:3001/pirate/matt` noting the console's output.
+And run `http://localhost:3001/pirate/matt` noting the Terminal's output.
 
 
 ###Other Routes and Modules
@@ -130,7 +121,6 @@ var pirateRoutes = function(app) {
     app.post('/api/pirates', pirates.add);
     app.put('/api/pirates/:id', pirates.update);
     app.delete('/api/pirates/:id', pirates.delete);
-    app.get('/api/import', pirates.import);
 }
 
 module.exports = pirateRoutes;
@@ -156,7 +146,7 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
-Check if its working. 
+###Check if its working. 
 
 Update findAll's definition in the controllers to a json snippet:
 
@@ -174,10 +164,10 @@ exports.findAll = function(req, res){
 Update server.js to require our routes file. The .js file extension can be omitted.
 
 ```js
-var express = require('express');
+const express = require('express');
 ...
-var routes = require('./my_modules/pirate.routes');
-var appRoutes = routes(app);
+const routes = require('./my_modules/pirate.routes');
+const appRoutes = routes(app);
 
 app.listen...
 ```
@@ -185,23 +175,23 @@ app.listen...
 Navigate to `localhost:3001/api/pirates`
 
 
-###Update index.js:
+###Update app.js:
 
 ```js
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser')
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser')
 
-var mongoose = require('mongoose');
-var mongoUri = 'mongodb://localhost/rest-api';
+const mongoose = require('mongoose');
+const mongoUri = 'mongodb://localhost/rest-api';
 mongoose.connect(mongoUri);
 
 // make sure this line is always before the routes
 app.use(bodyParser.json());
 
-var pirateModels = require('./models/pirate.model'); 
-var routes = require('./my_modules/pirate.routes');
-var appRoutes = routes(app);
+const pirateModels = require('./models/pirate.model'); 
+const routes = require('./my_modules/pirate.routes');
+const appRoutes = routes(app);
 
 app.listen(3001);
 console.log('Server running at http://localhost:3001/');
@@ -234,10 +224,10 @@ Create a new folder called models and add a new file `pirate.model.js` for our P
 Require Mongoose into this file, and create a new Schema object:
 
 ```js
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var PirateSchema = new Schema({
+const PirateSchema = new Schema({
     name: String,
     vessel: String,
     weapon: String
@@ -250,7 +240,7 @@ This schema makes sure we're getting and setting well-formed data to and from th
  
 The last line creates and exports the Pirate model object, with built in Mongo interfacing methods. We'll refer to this Pirate object in other files.
  
-Ensure that `var pirateModels = require('./models/pirate.model');` is in index.js
+Ensure that `var pirateModels = require('./models/pirate.model');` is in app.js
 
 Update `controllers/pirate.controllers.js` to require Mongoose, so we can create an instance of our Pirate model to work with. 
 
@@ -277,7 +267,7 @@ Passing find() {} means we are not filtering data by any of its properties and s
 
 Once Mongoose looks up the data it returns an error message and a result set. Use res.send() to return the raw results.
 
-###Start Mongoose
+###Test Mongoose
 
 Check the server and then visit the API endpoint for all pirates `localhost:3001/api/pirates`. You'll get JSON data back, in the form of an empty array.
 
@@ -344,7 +334,7 @@ This route's path uses a parameter pattern for id `/pirates/:id` which we can re
 
 At your find all endpoint `http://localhost:3001/api/pirates`, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one pirate's document.
 
-e.g. `http://localhost:3001/api/pirates/58c0d373d6f9c124b7f768b5`
+e.g. `http://localhost:3001/api/pirates/58c30e6e8676587a1dc690fb`
 
 ####Add a Pirate
 
@@ -354,7 +344,7 @@ We used create() for our import function to add multiple documents to our Pirate
 exports.add = function (req, res) {
     Pirate.create(req.body, function (err, pirate) {
         if (err) return console.log(err);
-        return res.send(pirate);
+        return res.send('This is a new pirate ' + pirate);
     });
 }
 ```
@@ -369,7 +359,11 @@ $ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Jean Lafitte
 
 Since modelling endpoints is a common task and is rendered difficult by the opaqueness of the http verbs most people use a utility such as [Postman](https://www.getpostman.com/). 
 
+Test a GET in postman with `http://localhost:3001/api/pirates/`
+
 We will create a new Pirate in Postman.
+
+Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/pirates/`
 
 ![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman2.png)
 
@@ -391,7 +385,7 @@ exports.delete = function (req, res) {
 Check it out with:
 
 ```
-$ curl -i -X DELETE http://localhost:3001/pirates/5820d3584dc4674967d091e6
+$ curl -i -X DELETE http://localhost:3001/pirates/58c31076b2bcb17ac13c01ec
 ```
 
 Create and test a delete Pirate action in Postman.
