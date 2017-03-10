@@ -50,9 +50,13 @@ exports.import = function (req, res) {
         { "name": "William Kidd", "vessel": "Adventure Galley", "weapon": "Sword" },
         { "name": "Samuel Bellamy", "vessel": "Whydah", "weapon": "Cannon" },
         { "name": "Mary Read", "vessel": "Rackham", "weapon": "Knife" },
-        { "name": "John Rackham", "vessel": "The Calico", "weapon": "Peg Leg" }
-        , function (err) {
-            if (err) return console.log(err);
-            return res.sendStatus(202);
-        });
+        { "name": "John Rackham", "vessel": "The Calico", "weapon": "Peg Leg" });
 };
+
+
+
+
+
+
+
+

@@ -12,15 +12,8 @@
 
 <body>
 
-	<body ng-controller="PirateAppController">
-		<h1>Pirates</h1>
-		<ul>
-			<li ng-repeat="pirate in pirates" class="fade" ng-class="{ even: $even, odd: $odd }">
-				{{ pirate.name }} {{ pirate._id }}
-				<span ng-click="deletePirate($index, pirate._id)">X</span>
-			</li>
-		</ul>
-
+	<body>
+		<pirate-list></pirate-list>
 	</body>
 </body>
 </html>
