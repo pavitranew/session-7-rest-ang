@@ -8,9 +8,13 @@
 
 Building a URL route scheme to map requests to app actions.
 
-1: `$ npm init` in the `rest-api` directory:
+1: `$ npm init` in the `rest-api` directory
 
-2: Create an npm script for nodemon (npm run start)
+2: Setup Tooling and npm Installs
+
+`sudo npm install --save nodemon express mongoose body-parser`
+
+3: Create an npm script for nodemon (npm run start)
 
 ```
 "scripts": {
@@ -18,9 +22,7 @@ Building a URL route scheme to map requests to app actions.
 },
 ```
 
-##Setup Tooling and npm Installs
 
-`sudo npm install --save nodemon express mongoose body-parser`
 
 ###1. Mongo
 
