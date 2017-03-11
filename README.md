@@ -8,11 +8,9 @@
 
 Building a URL route scheme to map requests to app actions.
 
-In the `rest-api` directory:
+1. `$ npm init` in the `rest-api` directory:
 
-`$ npm init`
-
-Create an npm script for nodemon (npm run start)
+2. Create an npm script for nodemon (npm run start)
 
 ```
 "scripts": {
@@ -22,11 +20,7 @@ Create an npm script for nodemon (npm run start)
 
 ##Setup Tooling and npm Installs
 
-A joke:
-
-"I went to an all night JavaScript hackathon and by morning we finally had the build process configured!"
-
-`sudo npm install --save-dev mongoose body-parser --save nodemon express`
+`sudo npm install --save nodemon express mongoose body-parser`
 
 ###1. Mongo
 
@@ -43,7 +37,7 @@ $ mongo
 
 ###2. Mongoose.js
 
-We'll use a [Mongo Driver](http://mongoosejs.com) to model application data. Here's a [quickstart guide](http://mongoosejs.com/docs/) for Mongoose.
+We'll use a [Mongo Driver](http://mongoosejs.com) to model application data. Here's the [quickstart guide](http://mongoosejs.com/docs/) for Mongoose.
 
 ###3. Body Parser
 
@@ -73,32 +67,21 @@ app.listen(3001);
 console.log('Server running at http://localhost:3001/');
 ```
 
-##API Routes
-
-###GET
-
 app.get is our test route to make sure everything is running correctly.
 
 The URL path is the root of the site, the handling method is an anonymous function, and the response is plain text.
 
 Run the app using `npm run start`.
 
-Make a change to res.send in app.js to check that the server restarts. 
+Make a change to res.send in app.js to check that the server restarts. (Keep an eye on the nodemon process during this exercise to see if it is hanging.)
 
-Refresh the browser and note the res (response) object being dumped into the console.
+##API Routes
 
-(Keep an eye on the nodemon process during this exercise to see if it is hanging.)
+###API Routes
 
+An api route is a predefined URL path that our API responds to. 
 
-###Other Routes and Modules
-
-Predefined URL paths your API responds to. Think of each Route as listening to three parts:
-
-* A specific HTTP Action (get, post...)
-* A specific URL path (/api/piates...)
-* A handler method (findAll)
-
-Add routes.js to `/my_modules/pirate.routes.js`. (Note: many people use src as the name of the folder instead of my_modules by convention.)
+Add routes.js to `/my_modules/pirate.routes.js`.
 
 ```js
 var pirates = require('pirate.controllers');
@@ -114,7 +97,13 @@ var pirateRoutes = function(app) {
 module.exports = pirateRoutes;
 ```
 
-Note: `module.exports` is the object that's returned as the result of a require call.
+Think of each Route as listening to three parts:
+
+* A specific HTTP Action (get, post...)
+* A specific URL path (/api/piates...)
+* A handler method (findAll)
+
+(Note: `module.exports` - the object that's returned as the result of a require call in app.js.)
 
 All the main elements of a [REST application](http://www.restapitutorial.com/lessons/httpmethods.html) - GET, POST, PUT, DELETE - http actions are accounted for here. 
 
@@ -136,7 +125,7 @@ exports.delete = function () { };
 
 ###Check if its working. 
 
-Update findAll's definition in the controllers to a json snippet:
+Update findAll's definition in `pirate.controllers.js` to a json snippet:
 
 ```js
 exports.findAll = function(req, res){
@@ -338,7 +327,7 @@ Use cURL to POST to the add endpoint with the full Pirate JSON as the request bo
 $ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Jean Lafitte", "vessel": "Barataria Bay", "weapon":"curses"}' http://localhost:3001/api/pirates
 ```
 
-###Postman
+###Instroducing Postman
 
 Since modelling endpoints is a common task and is rendered difficult by the opaqueness of the http verbs most people use a utility such as [Postman](https://www.getpostman.com/). 
 
@@ -413,7 +402,7 @@ app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + '/layouts/index.html'));
 });
 ``` -->
-Copy the static folder from today's repo into the rest-api folder.
+Note the static folder in today's repo.
 
 Add the static directory for our assets to app.js:
 
@@ -463,7 +452,7 @@ angular.module('pirateApp', [])
 <body ng-controller="PirateAppController">
     <h1>Pirates</h1>
     <ul>
-        <li ng-repeat="pirate in pirates">
+        <li ng-repeat="pirate in pirates"  class="fade">
             {{ pirate.name }}
             <span>X</span>
         </li>
@@ -477,7 +466,7 @@ Wire up the deletePirate function:
 
 ```
 <ul>
-    <li ng-repeat="pirate in pirates">
+    <li ng-repeat="pirate in pirates" class="fade">
         {{ pirate.name }} | {{ pirate._id }}
         <span ng-click="deletePirate(pirate._id)">X</span>
     </li>
@@ -504,20 +493,20 @@ $scope.deletePirate = function (index, pid) {
 
 ```
 <ul>
-    <li ng-repeat="pirate in pirates">
+    <li ng-repeat="pirate in pirates" class="fade">
         {{ pirate.name }} {{ pirate._id }}
         <span ng-click="deletePirate($index, pirate._id)">X</span>
     </li>
 </ul>
 ```
 
-###Wire up the Animation
+###Animation
 
 `const pirateApp = angular.module('pirateApp', ['ngAnimate'])`
 
 `ng-class="{ even: $even, odd: $odd }"`
 
-Add a class `fade` to the `li`s and add css:
+Note the class `fade` on the `li`'s and add css:
 
 ```
 .odd {background: #bada55;}
@@ -582,9 +571,7 @@ The model's update() takes three parameters:
 * JSON object of just the properties to update
 * callback function that returns the number of documents updated
 
-###Curl
-
-PUT actions are difficult to test in the browser, so we use cURL in the Terminal or Postman.
+###Test with Curl
 
 We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
 
@@ -596,15 +583,13 @@ This sends a JSON Content-Type PUT request to our update endpoint. That JSON obj
 
 Visit the same URL from the cURL request in the browser to see the changes.
 
-We'll use Postman to run through the process of editing a pirate above.
+PUT actions are difficult to test in the browser, so we'll use Postman to run through the process of editing a pirate above.
 
 Set the body to `raw` and the `text` header to application/json
 
 put
 http://localhost:3001/api/pirates/< _id >
 {"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}
-
-<!-- ![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman.png) -->
 
 
 
