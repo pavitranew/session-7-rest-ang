@@ -8,9 +8,9 @@
 
 Building a URL route scheme to map requests to app actions.
 
-1. `$ npm init` in the `rest-api` directory:
+1 `$ npm init` in the `rest-api` directory:
 
-2. Create an npm script for nodemon (npm run start)
+2 Create an npm script for nodemon (npm run start)
 
 ```
 "scripts": {
@@ -463,15 +463,15 @@ $scope.deletePirate = function (index, pid) {
 
 ###Animation
 
-1. Inject ng-animate:
+1 Inject ng-animate:
 
 `const pirateApp = angular.module('pirateApp', ['ngAnimate'])`
 
-2. Add ng-class to the repeated li's 
+2 Add ng-class to the repeated li's 
 
 `ng-class="{ even: $even, odd: $odd }"`
 
-3. Note the class `fade` on the `li`'s and add css:
+3 Note the class `fade` on the `li`'s and add css:
 
 ```
 .odd {background: #bada55;}
