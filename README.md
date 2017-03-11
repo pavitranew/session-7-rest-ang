@@ -79,14 +79,12 @@ Make a change to res.send in app.js to check that the server restarts. (Keep an 
 
 ##API Routes
 
-###API Routes
-
 An api route is a predefined URL path that our API responds to. 
 
-Add routes.js to `/my_modules/pirate.routes.js`.
+Add routes.js to `/src/pirate.routes.js`.
 
 ```js
-var pirates = require('pirate.controllers');
+var pirates = require('./pirate.controllers');
 
 var pirateRoutes = function(app) {
     app.get('/api/pirates', pirates.findAll);
@@ -125,7 +123,18 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
-###Check if its working. 
+Check if its working.
+
+Update `app.js` to require our routes file. The .js file extension can be omitted.
+
+```js
+const express = require('express');
+...
+const routes = require('./src/pirate.routes');
+const appRoutes = routes(app);
+
+app.listen...
+```
 
 Update findAll's definition in `pirate.controllers.js` to a json snippet:
 
@@ -138,17 +147,6 @@ exports.findAll = function(req, res){
 		"weapon": "sword"
 	}]);
 };
-```
-
-Update app.js to require our routes file. The .js file extension can be omitted.
-
-```js
-const express = require('express');
-...
-const routes = require('./src/pirate.routes');
-const appRoutes = routes(app);
-
-app.listen...
 ```
 
 Navigate to `localhost:3001/api/pirates`
@@ -185,17 +183,7 @@ app.get('/', function (req, res) {
 });
 ```
 
-<!-- - We're requiring the Mongoose module which will communicate with Mongo for us. 
-
-- The mongoUri is a location to the Mongo DB that Mongoose will create if there is not one there already. 
-
-- We added an error handler there to help debug issues connecting to Mongo collections. 
-
-- We configured Express with `app.use(bodyParser.json())` to parse requests' bodies (we'll use that for POST requests).
-
-- Lastly, we require the pirate model which we'll make next. -->
-
-Create a new folder called models and add a new file `pirate.model.js` for our Pirate Model.
+Add a new file `pirate.model.js` to `src` for our Pirate Model.
 
 Require Mongoose into this file, and create a new Schema object:
 
@@ -235,15 +223,11 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
-You may recognize find() as a mongo command. 
+You may recognize find() as a mongo command. Passing find(){} means we are not filtering data by any of its properties and so to return all of it. 
 
-Passing find() {} means we are not filtering data by any of its properties and so to return all of it. 
+Once Mongoose looks up the data it returns a result set. Use res.send() to return the raw results.
 
-Once Mongoose looks up the data it returns an error message and a result set. Use res.send() to return the raw results.
-
-###Test Mongoose
-
-Check the server and then visit the API endpoint for all pirates `localhost:3001/api/pirates`. You'll get JSON data back, in the form of an empty array.
+Check that the server is still running and then visit the API endpoint for all pirates `localhost:3001/api/pirates`. You'll get JSON data back - here, an empty array since we have no entries.
 
 ###Importing Data
 
@@ -265,7 +249,7 @@ Rather than use the Mongo command-line to insert entries into our collection, le
 app.get('/api/import', pirates.import);
 ```
 
-Now define the import method in our controller `src/pirate.controller.js`:
+Now define the import method in our controller `pirate.controllers.js`:
 
 ```js
 exports.import = function (req, res) {
@@ -281,17 +265,17 @@ exports.import = function (req, res) {
 };
 ```
 
-This import method adds four items from the JSON to a pirates collection. The Pirate model is referenced here to call its create method. create() takes one or more documents in JSON form, and a callback to run on completion. If an error occurs, Terminal will return the error and the request will timeout in the browser. On success, the 202 "Accepted" HTTP status code is returned to the browser. Restart your node server and visit this new endpoint to import data.
+This import method adds four items from the JSON to a pirates collection. The Pirate model is referenced here to call its create method. create() takes one or more documents in JSON form, and a callback to run on completion. If an error occurs, Terminal will return the error and the request will timeout in the browser. On success, the 202 "Accepted" HTTP status code is returned to the browser. 
+
+Visit this new endpoint to import data.
 
 `localhost:3001/api/import/`
-
-###Returning Data
 
 Now visit the `http://localhost:3001/api/pirates` endpoint to view the new pirates data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private _id and internal __v version key. 
 
 ####Find By id
 
-Recall our route for getting a pirate by its id: `app.get('/pirates/:id', pirates.findById)`. 
+Recall our route for getting a pirate by id: `app.get('/pirates/:id', pirates.findById)`. 
 
 Add the handler method:
 
@@ -306,9 +290,9 @@ exports.findById = function (req, res) {
 
 This route's path uses a parameter pattern for id `/pirates/:id` which we can refer to in `req`. Pass this id to Mongoose to look up and return just one document.
 
-At your find all endpoint `http://localhost:3001/api/pirates`, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one pirate's document.
+At your findAll endpoint `http://localhost:3001/api/pirates`, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one pirate's document.
 
-e.g. `http://localhost:3001/api/pirates/58c30e6e8676587a1dc690fb`
+e.g. `http://localhost:3001/api/pirates/58c2aefddcc6e56c41f96fe8`
 
 ####Add a Pirate
 
@@ -323,23 +307,21 @@ exports.add = function (req, res) {
 }
 ```
 
-Use cURL to POST to the add endpoint with the full Pirate JSON as the request body (making sure to check the URL port and path).
+In a new tab - use cURL to POST to the add endpoint with the full Pirate JSON as the request body (making sure to check the URL port and path).
 
 ```
-$ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Jean Lafitte", "vessel": "Barataria Bay", "weapon":"curses"}' http://localhost:3001/api/pirates
+$ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Blah Lafitte", "vessel": "Barataria Bay", "weapon":"curses"}' http://localhost:3001/api/pirates
 ```
 
-###Instroducing Postman
+###Introducing Postman
 
-Since modelling endpoints is a common task and is rendered difficult by the opaqueness of the http verbs most people use a utility such as [Postman](https://www.getpostman.com/). 
+Since modelling endpoints is a common task andfew enjoy using curl, most people use a utility such as [Postman](https://www.getpostman.com/). 
 
 Test a GET in postman with `http://localhost:3001/api/pirates/`
 
-We will create a new Pirate in Postman.
+Create a new Pirate in Postman.
 
 Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/pirates/`
-
-<!-- ![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman2.png) -->
 
 Refresh `http://localhost:3001/pirates` to see the new entry at the end.
 
@@ -356,48 +338,43 @@ exports.delete = function (req, res) {
 };
 ```
 
-Check it out with:
+You could check it out with (replacing the id at the end of the URL with a known id from you api/pirates endpoint):
 
 ```
 $ curl -i -X DELETE http://localhost:3001/api/pirates/58c39048b3ddce0348706837
 ```
 
-Create and test a delete Pirate action in Postman.
+But let's test a delete Pirate action in Postman.
+
+1: Set the action to Delete
+
+2: Grab an id from the pirates endpoint
+
+3: Test with `http://localhost:3001/api/pirates/58c39048b3ddce0348706837`
 
 ##Building a Front End for Our API
 
-Open and examine `index.html`.
+Open and examine `index.html`. Note ng-app.
 
-Edit this route in `app.js` to send the index file:
+Edit the `('/')` route in `app.js` to send the index file:
 
 ```js
 app.get('/', function(req, res) {
-    res.sendfile('./index.html')
+    res.sendFile(__dirname + '/index.html')
 })
 ```
 
-<!-- Note - `express deprecated res.sendfile: Use res.sendFile instead`
-
-```
-var path = require('path');
-
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname + '/layouts/index.html'));
-});
-``` -->
-Note the static folder in today's repo.
-
-Add the static directory for our assets to app.js:
+And add the static directory for our assets to app.js:
 
 `app.use(express.static('static'))`
 
-Create `angular.module.js`:
+Create `static/js/angular.module.js`:
 
 ```js
 angular.module('pirateApp', []);
 ```
 
-Let's run a simple test by pulling in data from our API.
+Let's run a test by pulling in data from our API.
 
 ```js
 angular.module('pirateApp', [])
@@ -442,9 +419,7 @@ $scope.deletePirate = function(pid) {
 }
 ```
 
-Clicking on an X will remove a pirate but you need to refresh to see the result. 
-
-It has no effect on the view ($scope)
+Clicking on an X will remove a pirate but you need to refresh to see the result. It has no effect on the view ($scope)
 
 ```
 $scope.deletePirate = function (index, pid) {
@@ -467,7 +442,7 @@ $scope.deletePirate = function (index, pid) {
 
 1: Inject ng-animate:
 
-`const pirateApp = angular.module('pirateApp', ['ngAnimate'])`
+`angular.module('pirateApp', ['ngAnimate'])`
 
 2: Add ng-class to the repeated li's 
 
@@ -543,7 +518,7 @@ The model's update() takes three parameters:
 We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
 
 ```
-$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/58c2aefddcc6e56c41f96fe8
+$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/58c45c729b421e1eaa1754a3
 ```
 
 This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update. 
@@ -552,11 +527,47 @@ Visit the same URL from the cURL request in the browser to see the changes.
 
 PUT actions are difficult to test in the browser, so we'll use Postman to run through the process of editing a pirate above.
 
+Set the action to put
+
 Set the body to `raw` and the `text` header to application/json
 
 put
-http://localhost:3001/api/pirates/< _id >
+http://localhost:3001/api/pirates/58c45c729b421e1eaa1754a3
 {"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}
+
+
+##Adding Forms to Interface With Our API
+
+###Add Pirate
+
+```
+$scope.addPirate = function (data) {
+    $http.post('/api/pirates/', data)
+        .then(function () {
+            $scope.pirates.push(data);
+            $scope.pirate = {};
+        })
+};
+```
+
+```
+<form ng-submit="addPirate(pirate)">
+    <input type="text" ng-model="pirate.name" />
+    <input type="text" ng-model="pirate.vessel" />
+    <input type="text" ng-model="pirate.weapon" />
+    <input type="submit" value="Add Pirate">
+</form>
+```
+
+###Edit Pirate
+
+Need to modularize and route our app first.
+
+
+
+Create a detail view
+
+
 
 
 
