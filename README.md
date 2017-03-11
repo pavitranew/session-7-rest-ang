@@ -364,32 +364,13 @@ Create and test a delete Pirate action in Postman.
 
 ##Building a Front End for Our API
 
-Open `index.html`:
+Open and examine `index.html`.
 
-```html
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>AngularJS Pirates</title>
-    <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
-    <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
-    <script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
-    <script src="/js/angular.module.js"></script>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-
-<body>
-    <h1>test</h1>
-</body>
-</html>
-```
-
-Edit this route in `app.js`:
+Edit this route in `app.js` to send the index file:
 
 ```js
 app.get('/', function(req, res) {
-    res.sendfile('./layouts/index.html')
+    res.sendfile('./index.html')
 })
 ```
 
@@ -412,26 +393,6 @@ Create `angular.module.js`:
 
 ```js
 angular.module('pirateApp', []);
-```
-Add a ngApp and css to index.html:
-
-```html
-<!DOCTYPE html>
-<html ng-app='pirateApp'>
-
-<head>
-    <title>AngularJS Pirates</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
-    <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
-    <script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
-    <script src="/js/angular.module.js"></script>
-</head>
-
-<body>
-    <h1>test</h1>
-</body>
-</html>
 ```
 
 Let's run a simple test by pulling in data from our API.
@@ -502,11 +463,15 @@ $scope.deletePirate = function (index, pid) {
 
 ###Animation
 
+1. Inject ng-animate:
+
 `const pirateApp = angular.module('pirateApp', ['ngAnimate'])`
+
+2. Add ng-class to the repeated li's 
 
 `ng-class="{ even: $even, odd: $odd }"`
 
-Note the class `fade` on the `li`'s and add css:
+3. Note the class `fade` on the `li`'s and add css:
 
 ```
 .odd {background: #bada55;}
