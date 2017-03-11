@@ -18,12 +18,12 @@ h1 {
 }
 
 ul {
-    list-style: circle inside;
+    list-style: none;
     margin-bottom: 2.5rem;
 }
 
 li {
-    margin-bottom: 1rem;
+    padding: 1rem;
 }
 
 input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea {

@@ -8,11 +8,11 @@
 
 Building a URL route scheme to map requests to app actions.
 
-In a new `rest-api` directory:
+In the `rest-api` directory:
 
 `$ npm init`
 
-Create an npm script for nodemon (npm run server)
+Create an npm script for nodemon (npm run start)
 
 ```
 "scripts": {
@@ -29,6 +29,7 @@ A joke:
 `sudo npm install --save-dev mongoose body-parser --save nodemon express`
 
 ###1. Mongo
+
 Run `mongod` in another Terminal tab (if it's not running already). 
 
 If you need help setting the permissions on the db folder [see this post](http://stackoverflow.com/questions/28987347/setting-read-write-permissions-on-mongodb-folder).
@@ -41,24 +42,24 @@ $ mongo
 ```
 
 ###2. Mongoose.js
+
 We'll use a [Mongo Driver](http://mongoosejs.com) to model application data. Here's a [quickstart guide](http://mongoosejs.com/docs/) for Mongoose.
 
 ###3. Body Parser
+
 [Body Parser](https://www.npmjs.com/package/body-parser) parses and places incoming requests in a `req.body` property so our handlers can use them.
-
-###4. Nodemon
-You've probably installed [Nodemon](https://nodemon.io) globally already.
-
-###5. Express
 
 ###app.js
 
 Create app.js for express:
 
-```
+```js
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
+
+// make sure this line always appears before the routes
+app.use(bodyParser.json());
 
 const mongoose = require('mongoose');
 const mongoUri = 'mongodb://localhost/rest-api';
@@ -66,7 +67,6 @@ mongoose.connect(mongoUri);
 
 app.get('/', function (req, res) {
     res.send('Ahoy there\n');
-    console.dir(res);
 });
 
 app.listen(3001);
@@ -89,31 +89,19 @@ Refresh the browser and note the res (response) object being dumped into the con
 
 (Keep an eye on the nodemon process during this exercise to see if it is hanging.)
 
-###URL Parameters
-
-Add a second route:
-
-```
-app.get('/pirate/:name', function(req, res) {
-   console.log(req.params.name)
-});
-```
-
-And run `http://localhost:3001/pirate/matt` noting the Terminal's output.
-
 
 ###Other Routes and Modules
 
 Predefined URL paths your API responds to. Think of each Route as listening to three parts:
 
-* A specific HTTP Action
-* A specific URL path
-* A handler method
+* A specific HTTP Action (get, post...)
+* A specific URL path (/api/piates...)
+* A handler method (findAll)
 
 Add routes.js to `/my_modules/pirate.routes.js`. (Note: many people use src as the name of the folder instead of my_modules by convention.)
 
 ```js
-var pirates = require('../controllers/pirate.controllers');
+var pirates = require('pirate.controllers');
 
 var pirateRoutes = function(app) {
     app.get('/api/pirates', pirates.findAll);
@@ -128,15 +116,15 @@ module.exports = pirateRoutes;
 
 Note: `module.exports` is the object that's returned as the result of a require call.
 
-All the main elements of a [REST application](http://www.restapitutorial.com/lessons/httpmethods.html) - GET, POST, PUT, DELETE - http actions are accounted for here. We've modeled our URL routes off of REST API conventions, and named our handling methods clearly - prefixing them with `api/` in order to differentiate them from routes we create within Angular.
+All the main elements of a [REST application](http://www.restapitutorial.com/lessons/httpmethods.html) - GET, POST, PUT, DELETE - http actions are accounted for here. 
+
+We've modeled our URL routes off of REST API conventions, and named our handling methods clearly - prefixing them with `api/` in order to differentiate them from routes we create within Angular.
 
 Note the require statement. We'll create a pirates controller and placed all our Request event handling methods inside the it. 
 
-###Controllers
+###Controllers 
 
-Create a folder called controllers at the top level. 
-
-Create a new file inside of that called `pirate.controllers.js`. We'll add each request handling method for pirates data to this file one by one. For now add these placeholders to pirates.js so we can restart the server without errors:
+Create a new file inside of `src` called `pirate.controllers.js`. We'll add each request handling method for pirates data to this file one by one. For now add these placeholders to pirates.js so we can restart the server without errors:
 
 ```js
 exports.findAll = function () { };
@@ -161,12 +149,12 @@ exports.findAll = function(req, res){
 };
 ```
 
-Update server.js to require our routes file. The .js file extension can be omitted.
+Update app.js to require our routes file. The .js file extension can be omitted.
 
 ```js
 const express = require('express');
 ...
-const routes = require('./my_modules/pirate.routes');
+const routes = require('./src/pirate.routes');
 const appRoutes = routes(app);
 
 app.listen...
@@ -175,7 +163,9 @@ app.listen...
 Navigate to `localhost:3001/api/pirates`
 
 
-###Update app.js:
+###Define Data Models
+
+Update  `app.js` with `const pirateModels = require('./models/pirate.model');`
 
 ```js
 const express = require('express');
@@ -186,10 +176,12 @@ const mongoose = require('mongoose');
 const mongoUri = 'mongodb://localhost/rest-api';
 mongoose.connect(mongoUri);
 
-// make sure this line is always before the routes
+// make sure this line always appears before the routes
 app.use(bodyParser.json());
 
+// NEW
 const pirateModels = require('./models/pirate.model'); 
+
 const routes = require('./my_modules/pirate.routes');
 const appRoutes = routes(app);
 
@@ -200,13 +192,9 @@ app.get('/', function (req, res) {
     res.send('Ahoy there\n');
     console.dir(res);
 });
-
-app.get('/pirate/:name', function(req, res) {
-   console.log(req.params.name)
-});
 ```
 
-- We're requiring the Mongoose module which will communicate with Mongo for us. 
+<!-- - We're requiring the Mongoose module which will communicate with Mongo for us. 
 
 - The mongoUri is a location to the Mongo DB that Mongoose will create if there is not one there already. 
 
@@ -214,10 +202,7 @@ app.get('/pirate/:name', function(req, res) {
 
 - We configured Express with `app.use(bodyParser.json())` to parse requests' bodies (we'll use that for POST requests).
 
-- Lastly, we require the pirate model which we'll make next.
-
-
-###Define Data Models
+- Lastly, we require the pirate model which we'll make next. -->
 
 Create a new folder called models and add a new file `pirate.model.js` for our Pirate Model.
 
@@ -239,8 +224,6 @@ module.exports = mongoose.model('Pirate', PirateSchema);
 This schema makes sure we're getting and setting well-formed data to and from the Mongo collection. Our schema has three String properties which define a Pirate object. 
  
 The last line creates and exports the Pirate model object, with built in Mongo interfacing methods. We'll refer to this Pirate object in other files.
- 
-Ensure that `var pirateModels = require('./models/pirate.model');` is in app.js
 
 Update `controllers/pirate.controllers.js` to require Mongoose, so we can create an instance of our Pirate model to work with. 
 
@@ -291,7 +274,7 @@ Rather than use the Mongo command-line to insert entries into our collection, le
 app.get('/api/import', pirates.import);
 ```
 
-Now define the import method in our controller `controllers/pirate.controller.js`:
+Now define the import method in our controller `src/pirate.controller.js`:
 
 ```js
 exports.import = function (req, res) {
@@ -365,7 +348,7 @@ We will create a new Pirate in Postman.
 
 Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/pirates/`
 
-![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman2.png)
+<!-- ![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman2.png) -->
 
 Refresh `http://localhost:3001/pirates` to see the new entry at the end.
 
@@ -385,14 +368,14 @@ exports.delete = function (req, res) {
 Check it out with:
 
 ```
-$ curl -i -X DELETE http://localhost:3001/pirates/58c31076b2bcb17ac13c01ec
+$ curl -i -X DELETE http://localhost:3001/api/pirates/58c39048b3ddce0348706837
 ```
 
 Create and test a delete Pirate action in Postman.
 
 ##Building a Front End for Our API
 
-Add a layouts directory and into it `index.html`:
+Open `index.html`:
 
 ```html
 <!DOCTYPE html>
@@ -403,7 +386,8 @@ Add a layouts directory and into it `index.html`:
     <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
     <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
     <script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/js/angular.module.js"></script>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 <body>
@@ -412,9 +396,7 @@ Add a layouts directory and into it `index.html`:
 </html>
 ```
 
-Note - this page is unavaiable (even if it is in the root directory).
-
-Add/edit this route to server.js:
+Edit this route in `app.js`:
 
 ```js
 app.get('/', function(req, res) {
@@ -422,7 +404,7 @@ app.get('/', function(req, res) {
 })
 ```
 
-Note - `express deprecated res.sendfile: Use res.sendFile instead`
+<!-- Note - `express deprecated res.sendfile: Use res.sendFile instead`
 
 ```
 var path = require('path');
@@ -430,23 +412,19 @@ var path = require('path');
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + '/layouts/index.html'));
 });
-```
+``` -->
+Copy the static folder from today's repo into the rest-api folder.
 
-Create css, js, and img folders in static or reuse the assets material.
+Add the static directory for our assets to app.js:
 
-Populate the js folder with app.js:
+`app.use(express.static('static'))`
+
+Create `angular.module.js`:
 
 ```js
 angular.module('pirateApp', []);
 ```
-
-Now we can access the page at localhost://300X however the we need to configure a static assets directory.
-
-Add a static directory for our assets to server.js
-
-`app.use(express.static('static'))`
-
-Add a ngApp:
+Add a ngApp and css to index.html:
 
 ```html
 <!DOCTYPE html>
@@ -454,11 +432,11 @@ Add a ngApp:
 
 <head>
     <title>AngularJS Pirates</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
     <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
     <script src="https://code.angularjs.org/1.6.2/angular-animate.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/js/angular.module.js"></script>
 </head>
 
 <body>
@@ -495,14 +473,6 @@ angular.module('pirateApp', [])
 
 ###Deleting a Pirate
 
-As a starting point reuse the array script. Recall the script from a previous lesson:
-
-```
-$scope.deletePirate = function(index) {
-    $scope.pirates.splice(index, 1);
-}
-```
-
 Wire up the deletePirate function:
 
 ```
@@ -520,7 +490,9 @@ $scope.deletePirate = function(pid) {
 }
 ```
 
-But this has no effect on the view ($scope)
+Clicking on an X will remove a pirate but you need to refresh to see the result. 
+
+It has no effect on the view ($scope)
 
 ```
 $scope.deletePirate = function (index, pid) {
@@ -540,6 +512,12 @@ $scope.deletePirate = function (index, pid) {
 ```
 
 ###Wire up the Animation
+
+`const pirateApp = angular.module('pirateApp', ['ngAnimate'])`
+
+`ng-class="{ even: $even, odd: $odd }"`
+
+Add a class `fade` to the `li`s and add css:
 
 ```
 .odd {background: #bada55;}
@@ -577,6 +555,8 @@ $scope.deletePirate = function (index, pid) {
 }
 ```
 
+
+
 ####Update a Pirate
 
 PUT HTTP actions in a REST API correlate to an Update method. The route for Update also uses an :id parameter.
@@ -587,9 +567,8 @@ exports.update = function (req, res) {
     const updates = req.body;
 
     Pirate.update({ "_id": id }, req.body,
-        function (err, numberAffected) {
+        function (err) {
             if (err) return console.log(err);
-            console.log('Updated %d pirates', numberAffected);
             return res.sendStatus(202);
         });
 };
@@ -610,317 +589,22 @@ PUT actions are difficult to test in the browser, so we use cURL in the Terminal
 We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
 
 ```
-$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/5820ce6379cc204557b40a21
+$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/58c2aefddcc6e56c41f96fe8
 ```
 
-#AAARGH - this stopped working
-
 This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update. 
-
-Terminal will output a JSON object of the response to the cURL request and Updated 1 pirates from our callback function.
 
 Visit the same URL from the cURL request in the browser to see the changes.
 
 We'll use Postman to run through the process of editing a pirate above.
 
-Remember to set the body to `raw` and the `text` header to application/json
+Set the body to `raw` and the `text` header to application/json
 
-post
-http://localhost:3001/api/pirates/
+put
+http://localhost:3001/api/pirates/< _id >
 {"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}
 
-![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman.png)
-
-
-##Notes
-
-https://www.mongodb.com/blog/post/building-your-first-application-mongodb-creating-rest-api-using-mean-stack-part-1
-
-
-
-
-##Visualisation
-
-![Image of chart](https://github.com/mean-fall-2016/session-7/blob/master/viz.png)
-
-```
-var express = require('express')
-var app = express()
-
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
-
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
-})
-```
-
-The homepage index.html will not load. 
-
-```
-var express = require('express')
-var app = express()
-
-var path = require('path');
-
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
-});
-
-app.listen(3008, function () {
-  console.log('Example app listening on port 3008!')
-})
-```
-
-
-```html
-<div ng-app="graphApp" ng-controller="graphController">
-	<div class="chart" style="width:{{width}}px; height:{{height}}px;">
-		<div class="y" style="width:{{height}}px;">{{yAxis}}</div>
-		<div class="x">{{xAxis}}</div>
-	</div>
-</div>
-```
-
-```js
-var app = angular.module('graphApp', []);
-app.controller('graphController', function($scope){
-
-	$scope.width = 600;
-	$scope.height = 400;
-	$scope.yAxis = "Booty Haul";
-	$scope.xAxis = "2015";	
-});
-```
-
-app.js will not be read.
-
-`https://expressjs.com/en/starter/static-files.html`
-
-```
-app.use(express.static('css'));
-app.use(express.static('js'));
-```
-
-Add some basic css
-
-```css
-html {
-  background-image: linear-gradient(to bottom, #023e54, #10aac0);
-  min-height: 100%;
-  height: auto;
-  margin: 0; 
-}
-
-body {
-  font-family: Helvetica, Arial, sans-serif;
-  color: #fff;
-  margin: 0;
-}
-.chart { 
-	border-left: 2px solid #ddd; 
-	border-bottom: 2px solid #ddd;
-	margin: 60px auto;
-	position: relative;
-}
-.y {
-	position: absolute;
-	bottom: 0;
-	padding: 6px;
-	transform-origin: bottom left;
-	transform: rotate(-90deg);
-	text-align: center;
-}
-.x {
-	position: absolute;
-	bottom: -70px;
-	padding: 6px;
-	width: 100%;
-	text-align: center;
-}
-```
-
-Take the data from data.js and add it to the controller:
-
-```js
-	var app = angular.module('graphApp', []);
-	app.controller('graphController', function($scope){
-
-		$scope.width = 600;
-		$scope.height = 400;
-		$scope.yAxis = "Booty Haul";
-		$scope.xAxis = "2015";
-
-		$scope.data = [
-		{
-			label: 'January',
-			value: 36
-		},
-		{
-			label: 'February',
-			value: 54
-		},
-		{
-			label: 'March',
-			value: 62
-		},
-		{
-			label: 'April',
-			value: 82
-		},
-		{
-			label: 'May',
-			value: 96
-		},
-		{
-			label: 'June',
-			value: 104
-		},
-		{
-			label: 'July',
-			value: 122
-		},
-		{
-			label: 'August',
-			value: 152
-		},
-		{
-			label: 'September',
-			value: 176
-		},
-		{
-			label: 'October',
-			value: 180
-		},
-		{
-			label: 'November',
-			value: 252
-		},
-		{
-			label: 'December',
-			value: 342
-		}
-		];
-	});
-```
-Add the bar data to the view:
-
-```html
-<div class="chart" style="width:{{width}}px; height:{{height}}px;">
-
-<div ng-repeat="bar in data" class="bar" style="height:{{bar.value}}px; width:{{width / data.length - 8 }}px; left:{{$index / data.length * width }}px">
-	<span class="value">{{bar.value}}</span>
-	<span class="label">{{bar.label}}</span>
-</div>
-```
-
-Add display for this to the css
-```css
-.bar {
-	background: rgba(146, 84, 164, 0.8);
-	position: absolute;
-	bottom: 0;
-}
-.bar:nth-of-type(even) {
-	background: rgba(188, 77, 61, 0.8);
-}
-.value {
-	display: inline-block;
-	margin-top: 10px;
-    	text-align: center;
-}
-.label {
-	position: absolute;
-	bottom: -30px;
-	font-size: 10px; 
-	transform: rotate(30deg);
-}
-```
-
-Add the array processor for `$scope.max`
-
-```js
-	var app = angular.module('graphApp', []);
-	app.controller('graphController', function($scope){
-		...
-
-		$scope.max = 0;
-		var arrLength = $scope.data.length;
-		for (var i =0; i < arrLength; i++){
-			if($scope.data[i].value > $scope.max){
-				$scope.max = $scope.data[i].value;
-			}
-		}
-	});
-
-```
-
-Use it to calculate the max height of the columns in css:
-
-```html
-style="height:{{bar.value / max * height }}px; width:{{width / data.length - 8 }}px; left:{{$index / data.length * width }}px"
-```
-
-
-
-
-```css
-html {
-  box-sizing: border-box;
-  background-image: -webkit-linear-gradient(top, #023e54, #10aac0);
-  min-height: 100%;
-  height: auto;
-  margin: 0; 
-}
-
-body {
-  font-family: Helvetica, Arial, sans-serif;
-  color: #fff;
-  text-align: center;
-  margin: 0;
-}
-.chart { 
-	border-left: 2px solid #ddd; 
-	border-bottom: 2px solid #ddd;
-	margin: 60px auto;
-	position: relative;
-}
-.y {
-	position: absolute;
-	bottom: 0;
-	padding: 6px;
-	transform-origin: bottom left;
-	transform: rotate(-90deg);
-	text-align: center;
-}
-.x {
-	position: absolute;
-	bottom: -70px;
-	padding: 6px;
-	width: 100%;
-	text-align: center;
-}
-.bar {
-	background: rgba(146, 84, 164, 0.8);
-	position: absolute;
-	bottom: 0;
-}
-.bar:nth-child(even) {
-	background: rgba(188, 77, 61, 0.8);
-}
-.value {
-	display: inline-block;
-	margin-top: 10px;
-}
-.label {
-	position: absolute;
-	bottom: -30px;
-	font-size: 10px; 
-	transform: rotate(30deg);
-}
-```
-
+<!-- ![Image of chart](https://github.com/mean-fall-2016/session-8/blob/master/assets/img/postman.png) -->
 
 
 
