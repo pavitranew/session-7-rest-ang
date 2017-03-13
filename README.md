@@ -394,7 +394,7 @@ angular.module('pirateApp', [])
     <ul>
         <li ng-repeat="pirate in pirates"  class="fade">
             {{ pirate.name }}
-            <span>X</span>
+            <span>✖︎</span>
         </li>
     </ul>
 </body>
@@ -408,7 +408,7 @@ Wire up the deletePirate function:
 <ul>
     <li ng-repeat="pirate in pirates" class="fade">
         {{ pirate.name }} | {{ pirate._id }}
-        <span ng-click="deletePirate(pirate._id)">X</span>
+        <span ng-click="deletePirate(pirate._id)">✖︎</span>
     </li>
 </ul>
 ```
@@ -433,7 +433,7 @@ $scope.deletePirate = function (index, pid) {
 <ul>
     <li ng-repeat="pirate in pirates" class="fade">
         {{ pirate.name }} {{ pirate._id }}
-        <span ng-click="deletePirate($index, pirate._id)">X</span>
+        <span ng-click="deletePirate($index, pirate._id)">✖︎</span>
     </li>
 </ul>
 ```
@@ -555,7 +555,7 @@ $scope.addPirate = function (data) {
     <input type="text" ng-model="pirate.name" />
     <input type="text" ng-model="pirate.vessel" />
     <input type="text" ng-model="pirate.weapon" />
-    <input type="submit" value="Add Pirate">
+    <button type="submit">Add Pirate</button>
 </form>
 ```
 
@@ -563,9 +563,166 @@ $scope.addPirate = function (data) {
 
 Need to modularize and route our app first.
 
+```js
+var pirateApp = angular.module('pirateApp', ['ngAnimate']);
+
+angular.module('pirateApp').component('pirateList', {
+    template: `
+    <h1>Pirates</h1>
+    <ul>
+        <li ng-repeat="pirate in pirates" class="fade" ng-class="{ even: $even, odd: $odd }">
+            {{ pirate.name }} {{ pirate._id }}
+            <span ng-click="deletePirate($index, pirate._id)">✖︎</span>
+        </li>
+    </ul>
+
+    <form ng-submit="addPirate(pirate)">
+        <input type="text" ng-model="pirate.name" />
+        <input type="text" ng-model="pirate.vessel" />
+        <input type="text" ng-model="pirate.weapon" />
+        <button type="submit">Add Pirate</button>
+    </form>
+    `,
+    controller: function PirateAppController($http, $scope){
+            $http.get('/api/pirates').
+                then(function (response) {
+                    $scope.pirates = response.data;
+                    console.log($scope.pirates);
+                })
+
+            $scope.deletePirate = function (index, pid) {
+                console.log(pid);
+                $http.delete('/api/pirates/' + pid)
+                .then( () => $scope.pirates.splice(index, 1))
+            }
+
+            $scope.addPirate = function (data) {
+            $http.post('/api/pirates/', data)
+                .then(function () {
+                    $scope.pirates.push(data);
+                    $scope.pirate = {};
+                })
+                }
+            }
+})
+```
+
+```
+<body>
+    <pirate-list></pirate-list>
+</body>
+```
+
 
 
 Create a detail view
+
+Inject ngRoute
+
+```
+var pirateApp = angular.module('pirateApp', ['ngAnimate', 'ngRoute']);
+```
+
+Pirate detail template
+
+```
+<h1>Pirate Detail View</h1>
+<div ng-hide="$ctrl.editorEnabled">
+    <dl>
+        <dt>Name</dt>
+        <dd>{{ $ctrl.pirate.name }}</dd>
+        <dt>Vessel</dt>
+        <dd>{{ $ctrl.pirate.vessel }}</dd>
+        <dt>Weapon</dt>
+        <dd>{{ $ctrl.pirate.weapon }}</dd>
+        <dt>ID</dt>
+        <dd>{{ $ctrl.pirate._id }}</dd>
+    </dl>
+    <button ng-click="$ctrl.enableEditor($ctrl.pirate)">Edit</button>
+</div>
+<div ng-show="$ctrl.editorEnabled">
+    <form ng-submit="$ctrl.savePirate($ctrl.pirate, $ctrl.pirate._id)" name="updatePirate">
+        <label>Name</label>
+        <input ng-model="$ctrl.pirate.name">
+        <label>Vessel</label>
+        <input ng-model="$ctrl.pirate.vessel">
+        <label>Weapon</label>
+        <input ng-model="$ctrl.pirate.weapon">
+        <label>ID</label>
+        <input ng-model="$ctrl.pirate._id">
+        <input type="submit" value="Save">
+    </form>
+</div>
+
+<button type="submit" ng-click="$ctrl.back()">Back</button>
+```
+
+Routing
+
+```
+angular.module('pirateApp').
+    config(['$locationProvider', '$routeProvider',
+        function config($locationProvider, $routeProvider) {
+            $routeProvider.
+                when('/', {
+                    template: '<pirates-view></pirates-view>'
+                }).
+                when('/pirates/:pirateId', {
+                    template: '<pirate-detail></pirate-detail>'
+                }).
+                otherwise('/');
+        }
+    ]);
+```
+
+```
+<li ng-repeat="pirate in pirates">
+    <a href="/api/pirates/{{ pirate._id }}">{{ pirate.name }}</a>
+    <span ng-click="deletePirate($index, pirate._id)">✖︎</span>
+</li>
+```
+
+
+```
+<body>
+    <div ng-view></div>
+</body>
+```
+
+In pirates-view.html we are currently going to an api endpoint /api/pirates/{{ pirate._id }} :
+
+1: change that to `#!/pirates/{{ pirate._id }}`
+
+2: Add the $http.get to pirate-detail.component.js:
+
+```
+controller:  function PirateDetailController($http, $routeParams) {
+    $http.get('/api/pirates/' + $routeParams.pirateId)
+    .then((response) => this.pirate = response.data);
+}
+```
+
+```
+this.editorEnabled = false;
+this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
+```
+
+```
+<button type="submit">Save</button>
+<button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
+```
+
+Update
+
+```
+this.savePirate = (pirate, pid) => {
+    $http.put('/api/pirates/' + pid)
+    .then((res) => this.editorEnabled = false )
+}
+```
+
+
+
 
 
 
