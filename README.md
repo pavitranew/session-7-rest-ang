@@ -607,7 +607,7 @@ angular.module('pirateApp').component('pirateList', {
 })
 ```
 
-```
+```html
 <body>
     <pirate-list></pirate-list>
 </body>
@@ -619,13 +619,13 @@ Create a detail view
 
 Inject ngRoute
 
-```
+```js
 var pirateApp = angular.module('pirateApp', ['ngAnimate', 'ngRoute']);
 ```
 
 Pirate detail template
 
-```
+```html
 <h1>Pirate Detail View</h1>
 <div ng-hide="$ctrl.editorEnabled">
     <dl>
@@ -659,7 +659,7 @@ Pirate detail template
 
 Routing
 
-```
+```js
 angular.module('pirateApp').
     config(['$locationProvider', '$routeProvider',
         function config($locationProvider, $routeProvider) {
@@ -675,7 +675,7 @@ angular.module('pirateApp').
     ]);
 ```
 
-```
+```js
 <li ng-repeat="pirate in pirates">
     <a href="/api/pirates/{{ pirate._id }}">{{ pirate.name }}</a>
     <span ng-click="deletePirate($index, pirate._id)">✖︎</span>
@@ -695,26 +695,26 @@ In pirates-view.html we are currently going to an api endpoint /api/pirates/{{ p
 
 2: Add the $http.get to pirate-detail.component.js:
 
-```
+```js
 controller:  function PirateDetailController($http, $routeParams) {
     $http.get('/api/pirates/' + $routeParams.pirateId)
     .then((response) => this.pirate = response.data);
 }
 ```
 
-```
+```js
 this.editorEnabled = false;
 this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
 ```
 
-```
+```html
 <button type="submit">Save</button>
 <button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
 ```
 
 Update
 
-```
+```js
 this.savePirate = (pirate, pid) => {
     $http.put('/api/pirates/' + pid)
     .then((res) => this.editorEnabled = false )
