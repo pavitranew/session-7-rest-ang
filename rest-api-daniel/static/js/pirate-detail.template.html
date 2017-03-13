@@ -1,0 +1,30 @@
+<h1>Pirate Detail View</h1>
+<div ng-hide="$ctrl.editorEnabled">
+    <dl>
+        <dt>Name</dt>
+        <dd>{{ $ctrl.pirate.name }}</dd>
+        <dt>Vessel</dt>
+        <dd>{{ $ctrl.pirate.vessel }}</dd>
+        <dt>Weapon</dt>
+        <dd>{{ $ctrl.pirate.weapon }}</dd>
+        <dt>ID</dt>
+        <dd>{{ $ctrl.pirate._id }}</dd>
+    </dl>
+    <button ng-click="$ctrl.toggleEditor($ctrl.pirate)">Edit</button>
+</div>
+<div ng-show="$ctrl.editorEnabled">
+    <form ng-submit="$ctrl.savePirate($ctrl.pirate, $ctrl.pirate._id)" name="updatePirate">
+        <label>Name</label>
+        <input ng-model="$ctrl.pirate.name">
+        <label>Vessel</label>
+        <input ng-model="$ctrl.pirate.vessel">
+        <label>Weapon</label>
+        <input ng-model="$ctrl.pirate.weapon">
+        <label>ID</label>
+        <input ng-model="$ctrl.pirate._id">
+        <button type="submit">Save</button>
+        <button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
+    </form>
+</div>
+
+<button type="submit" ng-click="$ctrl.back()">Back</button>

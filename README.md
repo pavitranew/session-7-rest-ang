@@ -1,4 +1,4 @@
-#MEAN Session Seven
+#MEAN Session Seven 
 
 ##Homework
 - create a form for adding a pirate and create a controller that works to create a new pirate
@@ -123,9 +123,9 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
-Check if its working.
+###Check if its working.
 
-Update `app.js` to require our routes file. The .js file extension can be omitted.
+1: Update `app.js` to require our routes file. The .js file extension can be omitted.
 
 ```js
 const express = require('express');
@@ -136,7 +136,7 @@ const appRoutes = routes(app);
 app.listen...
 ```
 
-Update findAll's definition in `pirate.controllers.js` to a json snippet:
+2: Update findAll's definition in `pirate.controllers.js` to a json snippet:
 
 ```js
 exports.findAll = function(req, res){
@@ -149,12 +149,14 @@ exports.findAll = function(req, res){
 };
 ```
 
-Navigate to `localhost:3001/api/pirates`
+3: Navigate to the specified route in `app.get('/api/pirates', pirates.findAll);` 
+
+`localhost:3001/api/pirates`
 
 
-###Define Data Models
+###Define Data Models (Mongoose)
 
-Update  `app.js` with `const pirateModels = require('./models/pirate.model');`
+Update  `app.js` with `const pirateModels = require('./src/pirate.model');`
 
 ```js
 const express = require('express');
@@ -169,7 +171,7 @@ mongoose.connect(mongoUri);
 app.use(bodyParser.json());
 
 // NEW
-const pirateModels = require('./models/pirate.model'); 
+const pirateModels = require('./src/pirate.model'); 
 
 const routes = require('./my_modules/pirate.routes');
 const appRoutes = routes(app);
@@ -204,9 +206,9 @@ This schema makes sure we're getting and setting well-formed data to and from th
  
 The last line creates and exports the Pirate model object, with built in Mongo interfacing methods. We'll refer to this Pirate object in other files.
 
-Update `controllers/pirate.controllers.js` to require Mongoose, so we can create an instance of our Pirate model to work with. 
+1: Update `src/pirate.controllers.js` to require Mongoose, so we can create an instance of our Pirate model to work with. 
 
-And update findAll() to query Mongo with the find() data model method.
+2: Update findAll() to query Mongo with the find() data model method.
 
 ```js
 const mongoose = require('mongoose');
@@ -243,16 +245,19 @@ $ mongo
 > db.pirates.find()
 ```
 
-Rather than use the Mongo command-line to insert entries into our collection, let's import pirate data with our REST API. Add a new route endpoint to `pirate.routes.js`:
+Rather than use the Mongo command-line to insert entries into our collection, let's import pirate data with our REST API. Add a new route endpoint to `pirate.routes.js`.
+
+1: Add to routes.js:
 
 ```js
 app.get('/api/import', pirates.import);
 ```
 
-Now define the import method in our controller `pirate.controllers.js`:
+2: define the import method in our controller `pirate.controllers.js`:
 
 ```js
 exports.import = function (req, res) {
+    // Pirate below refers to the mongoose schema
     Pirate.create(
         { "name": "William Kidd", "vessel": "Adventure Galley", "weapon": "Sword" },
         { "name": "Samuel Bellamy", "vessel": "Whydah", "weapon": "Cannon" },
@@ -288,7 +293,7 @@ exports.findById = function (req, res) {
 };
 ```
 
-This route's path uses a parameter pattern for id `/pirates/:id` which we can refer to in `req`. Pass this id to Mongoose to look up and return just one document.
+This route's path uses a parameter pattern for id `/pirates/:id` which we can refer to in `req` to look up and return just one document.
 
 At your findAll endpoint `http://localhost:3001/api/pirates`, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one pirate's document.
 
@@ -310,7 +315,7 @@ exports.add = function (req, res) {
 In a new tab - use cURL to POST to the add endpoint with the full Pirate JSON as the request body (making sure to check the URL port and path).
 
 ```
-$ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Blah Lafitte", "vessel": "Barataria Bay", "weapon":"curses"}' http://localhost:3001/api/pirates
+$ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Donald Trump", "vessel": "Trumps Junk", "weapon":"Twitter"}' http://localhost:3001/api/pirates
 ```
 
 ###Introducing Postman
@@ -319,9 +324,15 @@ Since modelling endpoints is a common task andfew enjoy using curl, most people 
 
 Test a GET in postman with `http://localhost:3001/api/pirates/`
 
-Create a new Pirate in Postman.
+####Create a new Pirate in Postman.
 
-Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/pirates/`
+1: Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/pirates/`
+
+2: Set Body to `{ "name":"ooops","vessel":"wow","weapon":"huh?" }`
+
+3: Choose `raw` and set the text type to JSON(application/json)
+
+4: Hit Send
 
 Refresh `http://localhost:3001/pirates` to see the new entry at the end.
 
@@ -338,23 +349,23 @@ exports.delete = function (req, res) {
 };
 ```
 
-You could check it out with (replacing the id at the end of the URL with a known id from you api/pirates endpoint):
+Check it out with curl (replacing the id at the end of the URL with a known id from you api/pirates endpoint):
 
 ```
 $ curl -i -X DELETE http://localhost:3001/api/pirates/58c39048b3ddce0348706837
 ```
 
-But let's test a delete Pirate action in Postman.
+Or by a Delete action in Postman.
 
 1: Set the action to Delete
 
-2: Grab an id from the pirates endpoint
+2: Append an id from the pirates endpoint to the /api/pirates endpoint
 
-3: Test with `http://localhost:3001/api/pirates/58c39048b3ddce0348706837`
+3: Hit Send (e.g.: `http://localhost:3001/api/pirates/58c39048b3ddce0348706837`)
 
 ##Building a Front End for Our API
 
-Open and examine `index.html`. Note ng-app.
+Open and examine `index.html`. Note `<html ng-app="pirateApp">`.
 
 Edit the `('/')` route in `app.js` to send the index file:
 
@@ -379,10 +390,9 @@ Let's run a test by pulling in data from our API.
 ```js
 angular.module('pirateApp', [])
     .controller('PirateAppController', function ($scope, $http) {
-        $http.get('/api/pirates').
-            then(function (response) {
+        $http.get('/api/pirates')
+            .then( (response) => {
                 $scope.pirates = response.data;
-                console.log($scope.pirates);
             });
     });
 ```
@@ -486,6 +496,28 @@ $scope.deletePirate = function (index, pid) {
 }
 ```
 
+Refactored module
+
+```
+var pirateApp = angular.module('pirateApp', ['ngAnimate']);
+
+angular.module('pirateApp').component('pirateList', {
+    templateUrl: '/js/pirate-list.template.html' ,
+    controller: function PirateAppController($http, $scope){
+        $http.get('/api/pirates').
+        then(function (response) {
+            $scope.pirates = response.data;
+            console.log($scope.pirates);
+        })
+
+        $scope.deletePirate = function(index, pid) {
+            $http.delete('/api/pirates/' + pid)
+            .then( () => $scope.pirates.splice(index, 1))
+        }
+    }
+})
+
+```
 
 
 ####Update a Pirate
@@ -497,7 +529,7 @@ exports.update = function (req, res) {
     const id = req.params.id;
     const updates = req.body;
 
-    Pirate.update({ "_id": id }, req.body,
+    Pirate.update({ "_id": id }, updates,
         function (err) {
             if (err) return console.log(err);
             return res.sendStatus(202);
@@ -511,7 +543,7 @@ The model's update() takes three parameters:
 
 * JSON object of matching properties to look up the doc with to update
 * JSON object of just the properties to update
-* callback function that returns the number of documents updated
+* callback function that returns any errors
 
 ###Test with Curl
 
@@ -527,18 +559,20 @@ Visit the same URL from the cURL request in the browser to see the changes.
 
 PUT actions are difficult to test in the browser, so we'll use Postman to run through the process of editing a pirate above.
 
-Set the action to put
+1: Set the action to put
 
-Set the body to `raw` and the `text` header to application/json
+2: Set the body to `raw` and the `text` header to application/json
 
-put
-http://localhost:3001/api/pirates/58c45c729b421e1eaa1754a3
-{"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}
+3: put `{"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}`
+
+4: Test to see changes
 
 
 ##Adding Forms to Interface With Our API
 
 ###Add Pirate
+
+1: Add to the controller for pirateList:
 
 ```
 $scope.addPirate = function (data) {
@@ -550,6 +584,8 @@ $scope.addPirate = function (data) {
 };
 ```
 
+2: Add to the template:
+
 ```
 <form ng-submit="addPirate(pirate)">
     <input type="text" ng-model="pirate.name" />
@@ -558,6 +594,8 @@ $scope.addPirate = function (data) {
     <button type="submit">Add Pirate</button>
 </form>
 ```
+
+3: Test
 
 ###Edit Pirate
 
@@ -623,7 +661,26 @@ Inject ngRoute
 var pirateApp = angular.module('pirateApp', ['ngAnimate', 'ngRoute']);
 ```
 
-Pirate detail template
+Add Routing
+
+```js
+angular.module('pirateApp')
+    .config(function config($locationProvider, $routeProvider) {
+    $routeProvider.
+      when('/', {
+          template: '<pirate-list></pirate-list>'
+      }).
+      when('/pirates/:pirateId', {
+          template: '<pirate-detail></pirate-detail>'
+      }).
+      otherwise('/');
+    }
+);
+```
+
+Test to see if the first route is working.
+
+Pirate-detail-template.html:
 
 ```html
 <h1>Pirate Detail View</h1>
@@ -657,43 +714,25 @@ Pirate detail template
 <button type="submit" ng-click="$ctrl.back()">Back</button>
 ```
 
-Routing
+Add link to existing pirate-list template:
 
-```js
-angular.module('pirateApp').
-    config(['$locationProvider', '$routeProvider',
-        function config($locationProvider, $routeProvider) {
-            $routeProvider.
-                when('/', {
-                    template: '<pirates-view></pirates-view>'
-                }).
-                when('/pirates/:pirateId', {
-                    template: '<pirate-detail></pirate-detail>'
-                }).
-                otherwise('/');
-        }
-    ]);
-```
-
-```js
-<li ng-repeat="pirate in pirates">
-    <a href="/api/pirates/{{ pirate._id }}">{{ pirate.name }}</a>
+```html
+<li ng-repeat="pirate in pirates" class="fade" ng-class="{ even: $even, odd: $odd }">
+    <a href="#!/pirates/{{ pirate._id }}">{{ pirate.name }}</a>
     <span ng-click="deletePirate($index, pirate._id)">✖︎</span>
 </li>
 ```
 
+2: Create an pirateDetail component 
 
 ```
-<body>
-    <div ng-view></div>
-</body>
+angular.module('pirateApp').component('pirateDetail', {
+    templateUrl: '/js/pirate-detail.template.html',
+    controller: 
+})
 ```
 
-In pirates-view.html we are currently going to an api endpoint /api/pirates/{{ pirate._id }} :
-
-1: change that to `#!/pirates/{{ pirate._id }}`
-
-2: Add the $http.get to pirate-detail.component.js:
+2: Add the $http.get to pirate-detail component controller:
 
 ```js
 controller:  function PirateDetailController($http, $routeParams) {
@@ -702,17 +741,42 @@ controller:  function PirateDetailController($http, $routeParams) {
 }
 ```
 
+Add ng-view to index.html:
+
+```
+<body>
+    <div ng-view></div>
+</body>
+```
+
+Test
+
+Back button
+
+```
+this.back = function () {
+    window.history.back();
+}   
+```
+
+Edit Button: Toggling the editor interface:
+
 ```js
 this.editorEnabled = false;
 this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
 ```
+
+Test this by changing the value to true:
+
+`this.editorEnabled = true;`
+
 
 ```html
 <button type="submit">Save</button>
 <button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
 ```
 
-Update
+Update controller
 
 ```js
 this.savePirate = (pirate, pid) => {
