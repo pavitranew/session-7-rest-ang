@@ -599,46 +599,28 @@ $scope.addPirate = function (data) {
 
 ###Edit Pirate
 
-Need to modularize and route our app first.
+Modularize and route our app first.
 
 ```js
-var pirateApp = angular.module('pirateApp', ['ngAnimate']);
-
 angular.module('pirateApp').component('pirateList', {
-    template: `
-    <h1>Pirates</h1>
-    <ul>
-        <li ng-repeat="pirate in pirates" class="fade" ng-class="{ even: $even, odd: $odd }">
-            {{ pirate.name }} {{ pirate._id }}
-            <span ng-click="deletePirate($index, pirate._id)">✖︎</span>
-        </li>
-    </ul>
-
-    <form ng-submit="addPirate(pirate)">
-        <input type="text" ng-model="pirate.name" />
-        <input type="text" ng-model="pirate.vessel" />
-        <input type="text" ng-model="pirate.weapon" />
-        <button type="submit">Add Pirate</button>
-    </form>
-    `,
-    controller: function PirateAppController($http, $scope){
+    templateUrl: '/js/pirate-list.template.html',
+    controller: function PirateAppController($http){
             $http.get('/api/pirates').
-                then(function (response) {
-                    $scope.pirates = response.data;
-                    console.log($scope.pirates);
+                then( (response) => {
+                    this.pirates = response.data;
+                    console.log(this.pirates);
                 })
 
-            $scope.deletePirate = function (index, pid) {
-                console.log(pid);
+            this.deletePirate = (index, pid) => {
                 $http.delete('/api/pirates/' + pid)
                 .then( () => $scope.pirates.splice(index, 1))
             }
 
-            $scope.addPirate = function (data) {
+            this.addPirate = function (data) {
             $http.post('/api/pirates/', data)
-                .then(function () {
-                    $scope.pirates.push(data);
-                    $scope.pirate = {};
+                .then( () => {
+                    this.pirates.push(data);
+                    this.pirate = {};
                 })
                 }
             }
@@ -680,7 +662,7 @@ angular.module('pirateApp')
 
 Test to see if the first route is working.
 
-Pirate-detail-template.html:
+pirate-detail.template.html:
 
 ```html
 <h1>Pirate Detail View</h1>
@@ -713,6 +695,8 @@ Pirate-detail-template.html:
 
 <button type="submit" ng-click="$ctrl.back()">Back</button>
 ```
+
+`https://docs.angularjs.org/guide/component`
 
 Add link to existing pirate-list template:
 

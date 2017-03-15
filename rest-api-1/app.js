@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const mongoUri = 'mongodb://localhost/rest-api';
 mongoose.connect(mongoUri);
 
-const pirateModels = require('./src/pirate.model');
+const pirateModels = require('./src/pirate.model'); 
 
 const routes = require('./src/pirate.routes');
 const appRoutes = routes(app);
@@ -20,4 +20,4 @@ app.get('/', function(req, res) {
 })
 
 app.listen(3001);
-console.log('Server running at http://localhost:3001/');
+console.log('Server running at http://localhost:3001/'); 

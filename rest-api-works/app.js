@@ -19,5 +19,5 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html')
 })
 
-app.listen(3002);
-console.log('Server running at http://localhost:3002/'); 
+app.listen(3001);
+console.log('Server running at http://localhost:3001/'); 

@@ -13,7 +13,8 @@
     <button ng-click="$ctrl.toggleEditor($ctrl.pirate)">Edit</button>
 </div>
 <div ng-show="$ctrl.editorEnabled">
-    <form ng-submit="$ctrl.savePirate($ctrl.pirate, $ctrl.pirate._id)" name="updatePirate">
+    <!-- <form ng-submit="$ctrl.savePirate($ctrl.pirate, $ctrl.pirate._id)" name="updatePirate"> -->
+    <form ng-submit="$ctrl.savePirate($ctrl.pirate)" name="updatePirate">
         <label>Name</label>
         <input ng-model="$ctrl.pirate.name">
         <label>Vessel</label>
