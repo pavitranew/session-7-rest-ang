@@ -256,7 +256,7 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
-`find()` is a mongoose method. Passing `find(){}` means we are not filtering data by any of its properties and so to return all of it. 
+`find()` is a [mongoose method](https://docs.mongodb.com/manual/reference/method/js-collection/). Passing `find(){}` means we are not filtering data by any of its properties and so to return all of it. 
 
 Once Mongoose looks up the data it returns a result set. Use res.send() to return the raw results.
 
