@@ -196,7 +196,7 @@ The last line creates and exports the Pirate model object, with built in Mongo i
 
 1: Update  `app.js` with
 
-```
+```js
 const mongoose = require('mongoose');
 const mongoUri = 'mongodb://localhost/rest-api';
 mongoose.connect(mongoUri);
@@ -278,7 +278,7 @@ $ mongo
 
 Rather than use the Mongo command-line to insert entries into our collection, let's import pirate data with our REST API. Add a new route endpoint to `pirate.routes.js`.
 
-1: Add to routes.js:
+1: Add to `pirate.routes.js`:
 
 ```js
 app.get('/api/import', pirates.import);
@@ -550,7 +550,7 @@ angular.module('pirateApp').component('pirateList', {
     templateUrl: '/js/pirate-list.template.html' ,
     controller: function PirateAppController($http, $scope){
         $http.get('/api/pirates').
-        then( (req, res) => {
+        then( (res) => {
             $scope.pirates = res.data;
         })
 
