@@ -1,0 +1,1 @@
+curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Donald Trump", "vessel": "Trumps Junk", "weapon":"Twitter"}' http://localhost:3001/api/pirates

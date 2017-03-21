@@ -56,7 +56,7 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
-    res.send('Ahoy there\n');
+    res.send('Ahoy there');
 });
 
 app.listen(3001);
@@ -81,7 +81,6 @@ app.get('/api/pirates', findAll);
 function findAll(req, res){
     res.send(
         [{
-            "id": 1,
             "name": "Max",
             "vessel": "HMS Booty",
             "weapon": "sword"
@@ -95,9 +94,9 @@ For better organization we will create separate modules for our routes and their
 Add routes.js to `/src/pirate.routes.js`.
 
 ```js
-var pirates = require('./pirate.controllers');
+const pirates = require('./pirate.controllers');
 
-var pirateRoutes = function(app) {
+const pirateRoutes = function(app) {
     app.get('/api/pirates', pirates.findAll);
     app.get('/api/pirates/:id', pirates.findById);
     app.post('/api/pirates', pirates.add);
@@ -153,7 +152,6 @@ app.listen...
 exports.findAll = function(req, res){
 	res.send(
         [{
-		"id": 1,
 		"name": "Max",
 		"vessel": "HMS Booty",
 		"weapon": "sword"
@@ -375,7 +373,7 @@ Our next REST endpoint, delete, reuses what we've done above. Add this to contro
 
 ```js
 exports.delete = function (req, res) {
-    var id = req.params.id;
+    let id = req.params.id;
     Pirate.remove({ '_id': id }, function (result) {
         return res.send(result);
     });
@@ -433,7 +431,7 @@ angular.module('pirateApp', [])
 
 ```html
 <body ng-controller="PirateAppController">
-    <h1>Pirates</h1>
+    <h1>Pirate List</h1>
     <ul>
         <li ng-repeat="pirate in pirates"  class="fade">
             {{ pirate.name }}

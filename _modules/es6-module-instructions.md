@@ -1,6 +1,6 @@
 1. First Install your dependencies:
 
-```bash
+```
 npm install webpack babel-loader babel-core babel-preset-es2015-native-modules --save-dev
 ```
 
