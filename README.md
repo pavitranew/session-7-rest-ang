@@ -1,8 +1,8 @@
 # MEAN Session Seven 
 
 ## Homework
-- run through the Mongoose [quick start](http://mongoosejs.com/docs/index.html) guide
-- create a form for adding a pirate and create a controller that works to create a new pirate
+- review the session
+- create a form for editing a pirate and create a controller that works to edit the existing pirate
 - send me a link to the github repo
 
 ## Building a Rest API
