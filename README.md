@@ -5,6 +5,7 @@
 - install the [Angular generator](https://github.com/angular/angular-cli) 
 
 On a mac: `sudo npm install -g @angular/cli`
+
 On a PC - run Powershell as Admin and `npm install -g @angular/cli`s
 
 <!-- - create a form for editing a pirate and create a controller that works to edit the existing pirate
