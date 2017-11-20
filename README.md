@@ -1,9 +1,9 @@
 # MEAN Session Seven 
 
 ## Homework
-- review the session
-- create a form for editing a pirate and create a controller that works to edit the existing pirate
-- send me a link to the github repo
+- prepare your midterm - see session 6 
+<!-- - create a form for editing a pirate and create a controller that works to edit the existing pirate
+- send me a link to the github repo -->
 
 ## Building a Rest API
 
@@ -75,7 +75,7 @@ Make a change to res.send in app.js to check that the server restarts. (Keep an 
 
 An api route is a predefined URL path that our API responds to. 
 
-```
+```js
 app.get('/api/pirates', findAll);
 
 function findAll(req, res){
@@ -135,7 +135,7 @@ exports.delete = function () { };
 
 ### Check if its working.
 
-1: Update `app.js` to require our routes file. The .js file extension can be omitted.
+1: Update `app.js` to require our routes file. The .js file extension can be omitted. NOTE: we are also creating the appRoutes variable to call the function in pritate.routes: `const pirateRoutes = function(app)`
 
 ```js
 const express = require('express');
@@ -150,11 +150,11 @@ app.listen...
 
 ```js
 exports.findAll = function(req, res){
-	res.send(
+    res.send(
         [{
-		"name": "Max",
-		"vessel": "HMS Booty",
-		"weapon": "sword"
+        "name": "Max",
+        "vessel": "HMS Booty",
+        "weapon": "sword"
         }]
     )
 };
@@ -199,8 +199,30 @@ The last line creates and exports the Pirate model object, with built in Mongo i
 ```js
 const mongoose = require('mongoose');
 const mongoUri = 'mongodb://localhost/rest-api';
+// or use an online db e.g.:
+// const mongoUri = 'mongodb://deverell:dd2345@ds113746.mlab.com:13746/pirates';
 mongoose.connect(mongoUri);
 ```
+
+=== NOTE
+To use an online db simply provide an different connection string:
+
+```js
+const mongoUri = 'mongodb://deverell:dd2345@ds113746.mlab.com:13746/pirates';
+```
+
+and wrap your `app.get` method in the url:
+
+```js
+mongoose.connect(mongoUri, (err, database) => {
+    app.get('/', function(req, res) {
+        res.sendFile(__dirname + '/index.html')
+    })
+})
+```
+
+=== 
+
 
 and  `const pirateModels = require('./src/pirate.model');`
 
@@ -219,7 +241,7 @@ app.use(bodyParser.json());
 // NEW
 const pirateModels = require('./src/pirate.model'); 
 
-const routes = require('./my_modules/pirate.routes');
+const routes = require('./src/pirate.routes');
 const appRoutes = routes(app);
 
 app.listen(3001);
@@ -231,6 +253,41 @@ app.get('/', function (req, res) {
 });
 ```
 
+Here is the alternate using mLab
+
+```js
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser')
+
+const mongoose = require('mongoose');
+// const mongoUri = 'mongodb://localhost/rest-api2';
+const mongoUri = 'mongodb://deverell:dd2345@ds113746.mlab.com:13746/pirates';
+
+mongoose.connect(mongoUri);
+
+// make sure this line always appears before the routes
+app.use(bodyParser.json());
+app.use(express.static('static'))
+
+const pirateModels = require('./src/pirate.model');
+
+const routes = require('./src/pirate.routes');
+const appRoutes = routes(app);
+
+
+mongoose.connect(mongoUri, (err, database) => {
+    app.get('/', function(req, res) {
+        res.sendFile(__dirname + '/index.html')
+    })
+})
+
+
+app.listen(3001);
+
+console.log('Server running at http://localhost:3001/');
+```
+
 2: Update `src/pirate.controllers.js` to require Mongoose, so we can create an instance of our Pirate model to work with.
 
 ```js
@@ -239,7 +296,7 @@ const Pirate = mongoose.model('Pirate');
 ...
 ```
 
-3: Update findAll() to query Mongo with the find() data model method.
+3: pirate.controllers: update findAll() to query Mongo with the find() data model method.
 
 ```js
 const mongoose = require('mongoose');
@@ -307,7 +364,7 @@ Visit this new endpoint to import data.
 
 `localhost:3001/api/import/`
 
-Now visit the `http://localhost:3001/api/pirates` endpoint to view the new pirates data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private _id and internal __v version key (added by Mongoose to track changes or revisions). 
+Now visit the `http://localhost:3001/api/pirates` endpoint to view the new pirates data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private `_id` and internal `__v` version key (added by Mongoose to track changes or revisions). 
 
 #### Find By id
 
@@ -345,7 +402,7 @@ exports.add = function (req, res) {
 
 In a new tab - use cURL to POST to the add endpoint with the full Pirate JSON as the request body (making sure to check the URL port and path).
 
-```
+```bash
 $ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Donald Trump", "vessel": "Trumps Junk", "weapon":"Twitter"}' http://localhost:3001/api/pirates
 ```
 
@@ -420,12 +477,12 @@ Let's run a test by pulling in data from our API.
 
 ```js
 angular.module('pirateApp', [])
-    .controller('PirateAppController', function ($scope, $http) {
-        $http.get('/api/pirates')
-            .then( (res) => {
-                $scope.pirates = res.data;
-            });
+.controller('PirateAppController', function ($scope, $http) {
+    $http.get('/api/pirates')
+    .then( (res) => {
+        $scope.pirates = res.data;
     });
+});
 ```
 
 
@@ -453,6 +510,8 @@ Wire up the deletePirate function:
     </li>
 </ul>
 ```
+
+Add a delete function to the controller:
 
 ```js
 $scope.deletePirate = function(pid) {
@@ -484,6 +543,8 @@ $scope.deletePirate = function (index, pid) {
 }
 ```
 
+Delete all your pirates and naviagate to `http://localhost:3001/api/import` to re-import them.
+
 
 ### Animation
 
@@ -503,7 +564,7 @@ $ npm install --save-dev node-sass
 
 Here's the css:
 
-```
+```css
 .odd {background: #bada55;}
 
 .fade.ng-enter {
@@ -563,7 +624,7 @@ angular.module('pirateApp').component('pirateList', {
 
 ```
 
-```
+```html
 <body>
     <pirate-list></pirate-list>
 </body>
