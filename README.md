@@ -9,7 +9,7 @@
 
 Building a URL route scheme to map requests to app actions.
 
-1: `$ npm init` in the `rest-api` directory
+1: `$ npm init -y` in the `rest-api` directory
 
 2: Setup Tooling and npm Installs
 
@@ -22,6 +22,8 @@ Building a URL route scheme to map requests to app actions.
     "start": "nodemon app.js"
 },
 ```
+
+4: Add a .gitignore file.
 
 
 
@@ -52,7 +54,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
 
-// make sure this line always appears before the routes
+// make sure this line always appears before any routes
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
@@ -73,7 +75,7 @@ Make a change to res.send in app.js to check that the server restarts. (Keep an 
 
 ## API Routes
 
-An api route is a predefined URL path that our API responds to. 
+An api route is a predefined URL path that our API responds to, e.g.:
 
 ```js
 app.get('/api/pirates', findAll);
@@ -143,7 +145,7 @@ const express = require('express');
 const routes = require('./src/pirate.routes');
 const appRoutes = routes(app);
 
-app.listen...
+...
 ```
 
 2: Update findAll's definition in `pirate.controllers.js` to a json snippet:
@@ -175,7 +177,7 @@ Using Mongoose requires that we create a model for our data.
 
 Add a new file `pirate.model.js` to `src` for our Pirate Model.
 
-Require Mongoose into this file, and create a new Schema object:
+Require Mongoose in this file, and create a new Schema object:
 
 ```js
 const mongoose = require('mongoose');
@@ -224,7 +226,9 @@ mongoose.connect(mongoUri, (err, database) => {
 === 
 
 
-and  `const pirateModels = require('./src/pirate.model');`
+and add a reference to our model:
+
+`const pirateModels = require('./src/pirate.model');`
 
 ```js
 const express = require('express');
@@ -253,7 +257,7 @@ app.get('/', function (req, res) {
 });
 ```
 
-Here is the alternate using mLab
+Here is the alternate using mLab:
 
 ```js
 const express = require('express');
@@ -341,7 +345,26 @@ Rather than use the Mongo command-line to insert entries into our collection, le
 app.get('/api/import', pirates.import);
 ```
 
-2: define the import method in our controller `pirate.controllers.js`:
+e.g.:
+
+```js
+const pirates = require('./pirate.controllers');
+
+const pirateRoutes = function(app) {
+    app.get('/api/pirates', pirates.findAll);
+    app.get('/api/pirates/:id', pirates.findById);
+    app.post('/api/pirates', pirates.add);
+    app.put('/api/pirates/:id', pirates.update);
+    app.delete('/api/pirates/:id', pirates.delete);
+
+    app.get('/api/import', pirates.import);
+    
+}
+
+module.exports = pirateRoutes;
+```
+
+2: define the import method in our controller `pirate.controllers.js` (add it to the bottom):
 
 ```js
 exports.import = function (req, res) {
