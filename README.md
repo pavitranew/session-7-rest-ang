@@ -408,7 +408,7 @@ exports.findById = function (req, res) {
         return res.send(result);
     });
 };
-```
+``` 
 
 This route's path uses a parameter pattern for id `/pirates/:id` which we can refer to in `req` to look up and return just one document.
 
@@ -493,7 +493,7 @@ And add the static directory for our assets to app.js:
 
 `app.use(express.static('static'))`
 
-Create `/js/pirate.module.js`:
+Create `static/js/pirate.module.js`:
 
 ```js
 angular.module('pirateApp', []);
@@ -502,8 +502,7 @@ angular.module('pirateApp', []);
 Let's run a test by pulling in data from our API.
 
 ```js
-angular.module('pirateApp', [])
-.controller('PirateAppController', function ($scope, $http) {
+app.controller('PirateAppController', function ($scope, $http) {
     $http.get('/api/pirates')
     .then( (res) => {
         $scope.pirates = res.data;
@@ -571,7 +570,7 @@ $scope.deletePirate = function (index, pid) {
 
 Changes to the db persist and are relected in the view.
 
-Delete all your pirates and naviagate to `http://localhost:3001/api/import` to re-import them.
+Delete all your pirates and navigate to `http://localhost:3001/api/import` to re-import them.
 
 
 ### Animation
@@ -645,9 +644,9 @@ Create `pirate-list.template.html`.
 Create a component:
 
 ```js
-var pirateApp = angular.module('pirateApp', ['ngAnimate']);
+const app = angular.module('pirateApp', ['ngAnimate']);
 
-pirateApp.component('pirateList', {
+app.component('pirateList', {
     templateUrl: '/js/pirate-list.template.html' ,
     controller: function PirateAppController($http, $scope){
         $http.get('/api/pirates').
@@ -778,9 +777,9 @@ $scope.addPirate = function (data) {
 The complete component:
 
 ```js
-var pirateApp = angular.module('pirateApp', ['ngAnimate']);
+const app = angular.module('pirateApp', ['ngAnimate']);
 
-angular.module('pirateApp').component('pirateList', {
+app.component('pirateList', {
     templateUrl: '/js/pirate-list.template.html' ,
     controller: function PirateAppController($http, $scope){
         $http.get('/api/pirates').
@@ -818,8 +817,7 @@ var pirateApp = angular.module('pirateApp', ['ngAnimate', 'ngRoute']);
 Add Routing
 
 ```js
-angular.module('pirateApp')
-    .config(function config($locationProvider, $routeProvider) {
+app.config(function config($locationProvider, $routeProvider) {
     $routeProvider.
       when('/', {
           template: '<pirate-list></pirate-list>'
@@ -896,7 +894,7 @@ Add link to existing pirate-list template:
 2: Create an pirateDetail component 
 
 ```js
-angular.module('pirateApp').component('pirateDetail', {
+app.component('pirateDetail', {
     templateUrl: '/js/pirate-detail.template.html',
     controller: 
 })
@@ -905,7 +903,7 @@ angular.module('pirateApp').component('pirateDetail', {
 2: Add the $http.get to pirate-detail component controller:
 
 ```js
-angular.module('pirateApp').component('pirateDetail', {
+app.component('pirateDetail', {
     templateUrl: '/js/pirate-detail.template.html',
     controller:  function PirateDetailController($http, $routeParams) {
         $http.get('/api/pirates/' + $routeParams.pirateId)
@@ -925,11 +923,12 @@ this.back = () => window.history.back();
 e.g.:
 
 ```js
-angular.module('pirateApp').component('pirateDetail', {
+app.component('pirateDetail', {
     templateUrl: '/js/pirate-detail.template.html',
     controller:  function PirateDetailController($http, $routeParams) {
         $http.get('/api/pirates/' + $routeParams.pirateId)
         .then((response) => this.pirate = response.data);
+
         this.back = () => window.history.back();  
     }
 })
@@ -947,7 +946,18 @@ this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
 e.g.:
 
 ```js
+app.component('pirateDetail', {
+    templateUrl: '/js/pirate-detail.template.html',
+    controller:  function PirateDetailController($http, $routeParams) {
+        $http.get('/api/pirates/' + $routeParams.pirateId)
+        .then((response) => this.pirate = response.data);
 
+        this.back = () => window.history.back();
+
+        this.editorEnabled = false;
+        this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
+    }
+})
 ```
 
 Test this by changing the value to true:
@@ -992,7 +1002,7 @@ this.savePirate = (pirate, pid) => {
 e.g.:
 
 ```js
-angular.module('pirateApp').component('pirateDetail', {
+app.component('pirateDetail', {
     templateUrl: '/js/pirate-detail.template.html',
     controller:  function PirateDetailController($http, $routeParams) {
         $http.get('/api/pirates/' + $routeParams.pirateId)
@@ -1013,39 +1023,20 @@ angular.module('pirateApp').component('pirateDetail', {
 The final pirate.module:
 
 ```js
-var pirateApp = angular.module('pirateApp', ['ngAnimate', 'ngRoute']);
+const app = angular.module('pirateApp', ['ngAnimate', 'ngRoute'])
 
-angular.module('pirateApp')
-.config(function config($locationProvider, $routeProvider) {
-    $routeProvider.
-    when('/', {
-        template: '<pirate-list></pirate-list>'
-    }).
-    when('/pirates/:pirateId', {
-        template: '<pirate-detail></pirate-detail>'
-    }).
-    otherwise('/');
+app.config(function config($locationProvider, $routeProvider) {
+$routeProvider.
+  when('/', {
+      template: '<pirate-list></pirate-list>'
+  }).
+  when('/pirates/:pirateId', {
+      template: '<pirate-detail></pirate-detail>'
+  }).
+  otherwise('/');
 }
 );
-
-angular.module('pirateApp').component('pirateDetail', {
-    templateUrl: '/js/pirate-detail.template.html',
-    controller:  function PirateDetailController($http, $routeParams) {
-        $http.get('/api/pirates/' + $routeParams.pirateId)
-        .then((response) => this.pirate = response.data);
-        this.back = () => window.history.back(); 
-
-        this.editorEnabled = false;
-        this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
-
-        this.savePirate = (pirate, pid) => {
-            $http.put('/api/pirates/' + pid, pirate)
-            .then((res) => this.editorEnabled = false )
-        }
-    }
-})
-
-pirateApp.component('pirateList', {
+app.component('pirateList', {
     templateUrl: '/js/pirate-list.template.html' ,
     controller: function PirateAppController($http, $scope){
         $http.get('/api/pirates').
@@ -1054,18 +1045,35 @@ pirateApp.component('pirateList', {
         })
 
         $scope.deletePirate = function(index, pid) {
-            console.log('DEL')
             $http.delete('/api/pirates/' + pid)
             .then( () => $scope.pirates.splice(index, 1))
         }
-
         $scope.addPirate = function (data) {
             $http.post('/api/pirates/', data)
-            .then( () => {
-                $scope.pirates.push(data);
+            .then( (res) => {
+                console.log(res.data)
+                $scope.pirates.push(res.data);
                 $scope.pirate = {};
             })
         };
+    }
+})
+
+app.component('pirateDetail', {
+    templateUrl: '/js/pirate-detail.template.html',
+    controller:  function PirateDetailController($http, $routeParams) {
+        $http.get('/api/pirates/' + $routeParams.pirateId)
+        .then((response) => this.pirate = response.data);
+
+        this.back = () => window.history.back();
+
+        this.editorEnabled = false;
+        this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
+
+        this.savePirate = (pirate, pid) => {
+            $http.put('/api/pirates/' + pid, pirate)
+            .then((res) => this.editorEnabled = false )
+        }
     }
 })
 ```
@@ -1086,7 +1094,6 @@ The final pirate-detail template:
         <dd>{{ $ctrl.pirate._id }}</dd>
     </dl>
     <button ng-click="$ctrl.toggleEditor($ctrl.pirate)">Edit</button>
-
 </div>
 <div ng-show="$ctrl.editorEnabled">
     <form ng-submit="$ctrl.savePirate($ctrl.pirate, $ctrl.pirate._id)" name="updatePirate">
@@ -1100,7 +1107,6 @@ The final pirate-detail template:
         <input ng-model="$ctrl.pirate._id">
         <input type="submit" value="Save">
     </form>
-
     <button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
 </div>
 
