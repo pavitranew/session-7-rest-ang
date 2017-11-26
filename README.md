@@ -6,10 +6,7 @@
 
 On a mac: `sudo npm install -g @angular/cli`
 
-On a PC - run Powershell as Admin and `npm install -g @angular/cli`s
-
-<!-- - create a form for editing a pirate and create a controller that works to edit the existing pirate
-- send me a link to the github repo -->
+On a PC - run Powershell as Admin and `npm install -g @angular/cli`
 
 ## Building a Rest API
 
@@ -23,7 +20,7 @@ Building a URL route scheme to map requests to app actions.
 
 3: Create an npm script for nodemon (npm run start)
 
-```
+```js
 "scripts": {
     "start": "nodemon app.js"
 },
@@ -31,9 +28,7 @@ Building a URL route scheme to map requests to app actions.
 
 4: Add a .gitignore file.
 
-
-
-#### 1. Mongo
+### 1. Mongo
 
 Run `mongod` in another Terminal tab (if it's not running already). 
 
@@ -41,7 +36,7 @@ If you need help setting the permissions on the db folder [see this post](http:/
 
 Test it:
 
-```
+```bash
 $ which mongod
 $ mongo
 > show dbs
@@ -129,7 +124,7 @@ We've modeled our URL routes off of REST API conventions, and named our handling
 
 Note the require statement. We'll create a pirates controller and placed all our Request event handling methods inside the it. 
 
-### Controllers 
+### Controllers
 
 Create a new file inside of `src` called `pirate.controllers.js`. We'll add each request handling method for pirates data to this file one by one. For now add these placeholders to pirates.js so we can restart the server without errors:
 
@@ -143,15 +138,27 @@ exports.delete = function () { };
 
 ### Check if its working.
 
-1: Update `app.js` to require our routes file. The .js file extension can be omitted. NOTE: we are also creating the appRoutes variable to call the function in pritate.routes: `const pirateRoutes = function(app)`
+1: Update `app.js` to require our routes file. The .js file extension can be omitted. `const routes = require('./src/pirate.routes');`
+
+NOTE: we are also creating the appRoutes variable to call the function in pritate.routes: `const pirateRoutes = function(app)`
 
 ```js
-const express = require('express');
-...
+const app = express();
+const bodyParser = require('body-parser')
+
+// make sure this line always appears before any routes
+app.use(bodyParser.json());
+
 const routes = require('./src/pirate.routes');
 const appRoutes = routes(app);
 
-...
+
+app.get('/', function (req, res) {
+    res.send('Ahoy there');
+});
+
+app.listen(3001);
+console.log('Server running at http://localhost:3001/');
 ```
 
 2: Update findAll's definition in `pirate.controllers.js` to a json snippet:
@@ -171,7 +178,6 @@ exports.findAll = function(req, res){
 3: Navigate to the specified route in `app.get('/api/pirates', pirates.findAll);`:
 
 `localhost:3001/api/pirates`
-
 
 ### Define Data Models (Mongoose)
 
@@ -213,7 +219,7 @@ mongoose.connect(mongoUri);
 ```
 
 === NOTE
-To use an online db simply provide an different connection string:
+To use an online db simply provide a different connection string:
 
 ```js
 const mongoUri = 'mongodb://deverell:dd2345@ds113746.mlab.com:13746/pirates';
@@ -233,7 +239,6 @@ mongoose.connect(mongoUri, (err, database) => {
 
 
 and add a reference to our model:
-
 `const pirateModels = require('./src/pirate.model');`
 
 ```js
@@ -259,7 +264,6 @@ console.log('Server running at http://localhost:3001/');
 
 app.get('/', function (req, res) {
     res.send('Ahoy there\n');
-    console.dir(res);
 });
 ```
 
@@ -303,7 +307,27 @@ console.log('Server running at http://localhost:3001/');
 ```js
 const mongoose = require('mongoose');
 const Pirate = mongoose.model('Pirate');
-...
+```
+
+At the top of the script. e.g.:
+
+```js
+const mongoose = require('mongoose');
+const Pirate = mongoose.model('Pirate');
+
+exports.findAll = function(req, res){
+    res.send(
+        [{
+        "name": "Max",
+        "vessel": "HMS Booty",
+        "weapon": "sword"
+        }]
+    )
+};
+exports.findById = function () { };
+exports.add = function () { };
+exports.update = function () { };
+exports.delete = function () { };
 ```
 
 3: pirate.controllers: update findAll() to query Mongo with the find() data model method.
@@ -432,7 +456,7 @@ exports.add = function (req, res) {
 In a new tab - use cURL to POST to the add endpoint with the full Pirate JSON as the request body (making sure to check the URL port and path).
 
 ```bash
-$ curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Donald Trump", "vessel": "Trumps Junk", "weapon":"Twitter"}' http://localhost:3001/api/pirates
+curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Donald Trump", "vessel": "Trumps Junk", "weapon":"Twitter"}' http://localhost:3001/api/pirates
 ```
 
 ### Introducing Postman
@@ -477,7 +501,7 @@ Or by a Delete action in Postman.
 
 3: Hit Send (e.g.: `http://localhost:3001/api/pirates/58c39048b3ddce0348706837`)
 
-# Building a Front End for Our API
+## Building a Front End for Our API
 
 Open and examine `index.html`. Note `<html ng-app="pirateApp">`.
 
@@ -493,15 +517,17 @@ And add the static directory for our assets to app.js:
 
 `app.use(express.static('static'))`
 
-Create `static/js/pirate.module.js`:
+Create `static/js/pirate.module.js` and add:
 
 ```js
-angular.module('pirateApp', []);
+const app = angular.module('pirateApp', []);
 ```
 
 Let's run a test by pulling in data from our API.
 
 ```js
+const app = angular.module('pirateApp', []);
+
 app.controller('PirateAppController', function ($scope, $http) {
     $http.get('/api/pirates')
     .then( (res) => {
@@ -510,6 +536,7 @@ app.controller('PirateAppController', function ($scope, $http) {
 });
 ```
 
+Edit index.html:
 
 ```html
 <body ng-controller="PirateAppController">
@@ -523,9 +550,11 @@ app.controller('PirateAppController', function ($scope, $http) {
 </body>
 ```
 
+and test.
+
 ### Deleting a Pirate
 
-Wire up the deletePirate function:
+Wire up the deletePirate function with `ng-click`:
 
 ```html
 <ul>
@@ -536,12 +565,29 @@ Wire up the deletePirate function:
 </ul>
 ```
 
-Add a delete function to the controller:
+Add a delete function to the controller in `pirate.module.js`:
 
 ```js
 $scope.deletePirate = function(pid) {
     $http.delete('/api/pirates/' + pid);
 }
+```
+
+e.g.:
+
+```js
+const app = angular.module('pirateApp', []);
+
+app.controller('PirateAppController', function ($scope, $http) {
+    $http.get('/api/pirates')
+    .then( (res) => {
+        $scope.pirates = res.data;
+    });
+
+    $scope.deletePirate = function(pid) {
+        $http.delete('/api/pirates/' + pid);
+    }
+});
 ```
 
 Clicking on an X will remove a pirate but you need to refresh to see the result. It has no effect on the view ($scope).
@@ -559,7 +605,6 @@ Pass $index to the function:
 
 Use a promise and splice to undate scope:
 
-
 ```js
 $scope.deletePirate = function (index, pid) {
     console.log(pid);
@@ -568,10 +613,18 @@ $scope.deletePirate = function (index, pid) {
 }
 ```
 
+REfactor to use arrow functions and template literals:
+
+```js
+$scope.deletePirate = (index, pid) => {
+    $http.delete(`/api/pirates/${pid}`)
+    .then( () => $scope.pirates.splice(index, 1))
+}
+```
+
 Changes to the db persist and are relected in the view.
 
 Delete all your pirates and navigate to `http://localhost:3001/api/import` to re-import them.
-
 
 ### Animation
 
@@ -579,7 +632,7 @@ Delete all your pirates and navigate to `http://localhost:3001/api/import` to re
 
 `angular.module('pirateApp', ['ngAnimate'])`
 
-2: Add ng-class to the repeated li's 
+2: Add ng-class to the repeated li's:
 
 `ng-class="{ even: $even, odd: $odd }"`
 
@@ -587,7 +640,7 @@ $ npm install --save-dev node-sass
 
 "watch-sass": "node-sass --watch static/css/styles.scss --output static/css/  --source-map true",
 
-3: Note the class `fade` on the `li`'s. 
+3: Note the class `fade` on the `li`'s.
 
 Here's the css:
 
@@ -629,7 +682,7 @@ Here's the css:
 
 Refactor module
 
-Create `pirate-list.template.html`.
+Create `js/pirate-list.template.html`.
 
 ```html
   <h1>Pirate List</h1>
@@ -641,7 +694,7 @@ Create `pirate-list.template.html`.
   </ul>
 ```
 
-Create a component:
+Refactor the module to create a component:
 
 ```js
 const app = angular.module('pirateApp', ['ngAnimate']);
@@ -722,7 +775,6 @@ PUT actions are difficult to test in the browser, so we'll use Postman to run th
 3: put `{"name": "Donald Trump", "vessel": "Trump's Junk", "weapon":"Twitter"}`
 
 4: Test to see changes
-
 
 ## Adding Forms to Interface With Our API
 
@@ -832,19 +884,17 @@ app.config(function config($locationProvider, $routeProvider) {
 
 Add ng-view to index.html:
 
-```
+```html
 <body>
     <div ng-view></div>
 </body>
 ```
 
-Test to see if the first route is working.
-
-### Pirate Detail Template
+Pirate Detail Template
 
 [ng-show / hide](https://docs.angularjs.org/api/ng/directive/ngShow)
 
-pirate-detail.template.html:
+`js/pirate-detail.template.html`:
 
 ```html
 <h1>Pirate Detail View</h1>
@@ -891,16 +941,9 @@ Add link to existing pirate-list template:
 </ul>
 ```
 
-2: Create an pirateDetail component 
+2: Create an pirateDetail component.
 
-```js
-app.component('pirateDetail', {
-    templateUrl: '/js/pirate-detail.template.html',
-    controller: 
-})
-```
-
-2: Add the $http.get to pirate-detail component controller:
+Use $http.get and $routeParams to grab the info from our api route:
 
 ```js
 app.component('pirateDetail', {
@@ -912,12 +955,12 @@ app.component('pirateDetail', {
 })
 ```
 
-Test - you should now be able to view the deail template.
+Test - you should now be able to view the detail template.
 
 #### Back button
 
 ```js
-this.back = () => window.history.back();  
+this.back = () => window.history.back();
 ```
 
 e.g.:
@@ -990,7 +1033,7 @@ e.g.:
 </div>
 ```
 
-Update controller
+Update the controller with a save pirate function:
 
 ```js
 this.savePirate = (pirate, pid) => {
