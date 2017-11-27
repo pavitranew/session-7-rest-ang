@@ -490,7 +490,7 @@ exports.delete = function (req, res) {
 Check it out with curl (replacing the id at the end of the URL with a known id from you api/pirates endpoint):
 
 ```
-$ curl -i -X DELETE http://localhost:3001/api/pirates/58c39048b3ddce0348706837
+$ curl -i -X DELETE http://localhost:3001/api/pirates/5a1af3f1a77dff32001d9d24
 ```
 
 Or by a Delete action in Postman.
@@ -503,7 +503,7 @@ Or by a Delete action in Postman.
 
 ## Building a Front End for Our API
 
-Open and examine `index.html`. Note `<html ng-app="pirateApp">`.
+Open and examine `index.html`. Note `<html ng-app="pirateApp">` and `<script src="/js/pirate.module.js"></script>`.
 
 Edit the `('/')` route in `app.js` to send the index file:
 
@@ -551,6 +551,14 @@ Edit index.html:
 ```
 
 and test.
+
+Refactored controller:
+
+```js
+app.controller('PirateAppController', ($scope, $http) => {
+    $http.get('/api/pirates').then( (res) => {$scope.pirates = res.data});
+});
+```
 
 ### Deleting a Pirate
 
@@ -603,7 +611,7 @@ Pass $index to the function:
 </ul>
 ```
 
-Use a promise and splice to undate scope:
+Add a promise and use the Array method [splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) on the index to update the scope:
 
 ```js
 $scope.deletePirate = function (index, pid) {
@@ -613,7 +621,7 @@ $scope.deletePirate = function (index, pid) {
 }
 ```
 
-REfactor to use arrow functions and template literals:
+Refactor to use arrow functions and template literals:
 
 ```js
 $scope.deletePirate = (index, pid) => {
@@ -628,6 +636,8 @@ Delete all your pirates and navigate to `http://localhost:3001/api/import` to re
 
 ### Animation
 
+Note: perform step 3 *only* if using sass.
+
 1: Inject ng-animate:
 
 `angular.module('pirateApp', ['ngAnimate'])`
@@ -636,11 +646,10 @@ Delete all your pirates and navigate to `http://localhost:3001/api/import` to re
 
 `ng-class="{ even: $even, odd: $odd }"`
 
-$ npm install --save-dev node-sass
+3: `$ npm install --save-dev node-sass` and add a script to the manifest:
+`"watch-sass": "node-sass --watch static/css/styles.scss --output static/css/  --source-map true",`
 
-"watch-sass": "node-sass --watch static/css/styles.scss --output static/css/  --source-map true",
-
-3: Note the class `fade` on the `li`'s.
+4: Note the class `fade` on the `li`'s.
 
 Here's the css:
 
@@ -682,7 +691,7 @@ Here's the css:
 
 Refactor module
 
-Create `js/pirate-list.template.html`.
+Create `js/pirate-list.template.html` fromt he current contents of the html, e.g.:
 
 ```html
   <h1>Pirate List</h1>
@@ -727,7 +736,7 @@ Feed the component to the view:
 
 #### Update a Pirate
 
-PUT HTTP actions in a REST API correlate to an Update method. 
+`put` HTTP actions in a REST API correlate to an Update method. 
 
 The route for Update also uses an :id parameter.
 
@@ -746,7 +755,7 @@ exports.update = function (req, res) {
 };
 ```
 
-Notice the updates variable storing the req.body. req.body is useful when you want to pass in larger chunks of data such as a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
+Notice the updates variable storing the req.body. req.body is useful when you want to pass in larger chunks of data like a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
 
 The model's update() takes three parameters:
 
@@ -759,14 +768,14 @@ The model's update() takes three parameters:
 We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
 
 ```
-$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/58ced55bed7a7d6d28c46752
+$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/5a1c5f02bf68ad6532ef3ced
 ```
 
 This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update. 
 
 Visit the same URL from the cURL request in the browser to see the changes.
 
-PUT actions are difficult to test in the browser, so we'll use Postman to run through the process of editing a pirate above.
+PUT actions are cumbersome to test in the browser, so we'll use Postman to run through the process of editing a pirate above.
 
 1: Set the action to put and the url to a single entry with an id.
 
@@ -785,7 +794,7 @@ PUT actions are difficult to test in the browser, so we'll use Postman to run th
 ```html
 <h1>Pirate List</h1>
 <ul>
-    <li ng-repeat="pirate in pirates" ng-class="{ even: $even, odd: $odd }">
+    <li ng-repeat="pirate in pirates" class="fade" ng-class="{ even: $even, odd: $odd }">
         {{ pirate.name }} {{ pirate._id }}
         <span ng-click="deletePirate($index, pirate._id)">✖︎</span>
     </li>
@@ -928,9 +937,7 @@ Pirate Detail Template
 <button type="submit" ng-click="$ctrl.back()">Back</button>
 ```
 
-`https://docs.angularjs.org/guide/component`
-
-Add link to existing pirate-list template:
+Add a link using the id `href="#!/pirates/{{ pirate._id }}"` to existing pirate-list template:
 
 ```html
 <ul>
@@ -958,6 +965,8 @@ app.component('pirateDetail', {
 Test - you should now be able to view the detail template.
 
 #### Back button
+
+Note the use of `$ctrl` and `this` here instead of $scope.
 
 ```js
 this.back = () => window.history.back();
