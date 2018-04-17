@@ -1,8 +1,9 @@
-# MEAN Session Seven 
+# MEAN Session Seven
 
 ## Homework
-- prepare your midterm - see session 6
-- install the [Angular generator](https://github.com/angular/angular-cli) 
+
+1. prepare your midterm - see session 6
+1. install the [Angular generator](https://github.com/angular/angular-cli)
 
 On a mac: `sudo npm install -g @angular/cli`
 
