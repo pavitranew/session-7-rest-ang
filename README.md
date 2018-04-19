@@ -644,10 +644,10 @@ Note: perform step 3 *only* if using sass.
 
 `ng-class="{ even: $even, odd: $odd }"`
 
-3: `$ npm install --save-dev node-sass` and add a script to the manifest:
-`"watch-sass": "node-sass --watch static/css/styles.scss --output static/css/  --source-map true",`
+<!-- 3: `$ npm install --save-dev node-sass` and add a script to the manifest:
+`"watch-sass": "node-sass --watch static/css/styles.scss --output static/css/  --source-map true",` -->
 
-4: Note the class `fade` on the `li`'s.
+3: Note the class `fade` on the `li`'s.
 
 Here's the css:
 
@@ -689,7 +689,7 @@ Here's the css:
 
 Refactor module
 
-Create `js/pirate-list.template.html` fromt he current contents of the html, e.g.:
+Create `js/pirate-list.template.html` from the current contents of the html, e.g.:
 
 ```html
   <h1>Pirate List</h1>
@@ -720,7 +720,6 @@ app.component('pirateList', {
         }
     }
 })
-
 ```
 
 Feed the component to the view:
@@ -737,7 +736,7 @@ Feed the component to the view:
 
 The route for Update also uses an :id parameter.
 
-In pirate.controllers.js:
+In `pirate.controllers.js`:
 
 ```js
 exports.update = function (req, res) {
@@ -752,7 +751,7 @@ exports.update = function (req, res) {
 };
 ```
 
-Notice the updates variable storing the req.body. req.body is useful when you want to pass in larger chunks of data like a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
+Notice the updates variable storing the `req.body`. `req.body` is useful when you want to pass in larger chunks of data like a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
 
 The model's update() takes three parameters:
 
@@ -765,7 +764,7 @@ The model's update() takes three parameters:
 We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
 
 ```sh
-curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/5a1c5f02bf68ad6532ef3ced
+curl -i -X PUT -H 'Content-Type: application/json' -d '{"vessel": "Big Vessel"}' http://localhost:3001/api/pirates/5a1cb0639b8e063c479140d6
 ```
 
 This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update.
@@ -805,7 +804,7 @@ PUT actions are cumbersome to test in the browser, so we'll use Postman to run t
 </form>
 ```
 
-2: Add to the pirateList module:
+2: Add to the pirate module:
 
 ```js
 $scope.addPirate = function (data) {
@@ -817,7 +816,7 @@ $scope.addPirate = function (data) {
 };
 ```
 
-3: Test
+3: Test by adding a pirate
 
 Note the lack of an id. Edit the push to use the data returned by the response:
 
