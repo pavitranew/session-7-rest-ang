@@ -30,12 +30,19 @@ Start `mongod` in another Terminal tab (if it's not running already).
 
 If you need help setting the permissions on the db folder [see this post](http://stackoverflow.com/questions/28987347/setting-read-write-permissions-on-mongodb-folder).
 
+```sh
+$ mongod
+// should return waiting for connections on port 27017
+```
+
 Test it in another terminal tab:
 
-```bash
+```sh
 $ which mongod
+// the location of mongo
 $ mongo
 > show dbs
+> exit
 ```
 
 #### Body Parser
@@ -44,7 +51,7 @@ $ mongo
 
 #### app.js
 
-Create app.js for express:
+Create `app.js` for express at the top level of the `rest-api` folder:
 
 ```js
 const express = require('express');
@@ -90,7 +97,7 @@ function findAll(req, res){
 };
 ```
 
-For better organization (at the cost of a bit of complexity) we will create separate modules for our routes and their associated controllers.
+For better organization (at the cost of a bit of complexity) we will create separate modules for our routes and their associated controllers in a new `src` directory.
 
 Add routes.js to `/src/recipe.routes.js`.
 
@@ -124,7 +131,9 @@ Note the require statement. We'll create a recipes controller and placed all our
 
 ### Controllers
 
-Create a new file inside of `src` called `recipe.controllers.js`. We'll add each request handling method for pirates data to this file one by one. For now add these placeholders to pirates.js so we can restart the server without errors:
+Create a new file inside of `src` called `recipe.controllers.js`. We'll add each request handling method for recipes data to this file one by one.
+
+The are just empty functions for the moment.
 
 ```js
 exports.findAll = function () { };
@@ -180,13 +189,15 @@ exports.findAll = function (req, res) {
 
 `localhost:3001/api/recipes`
 
+You should see the json in the bowser.
+
 ### Define Data Models (Mongoose)
 
 Rather than using the MongoClient ( e.g. `const mongo = require('mongoDB').MongoClient;`), we will use [Mongoose](http://mongoosejs.com) to model application data. Here's the [quickstart guide](http://mongoosejs.com/docs/).
 
-Mongoose is built upon the MongoDB driver we used previously. However Mongoose allows us to model our data - declare that the data be of a certain type, validate the data, and build queries.
+Mongoose is built upon the MongoDB driver we used previously so everything we are doing here would work with the original driver. However, Mongoose allows us to model our data - declare that the data be of a certain type, validate the data, and build queries. This is something that is integral to TypeScript and so will be unnecessary in our future work with Angular 2+.
 
-Add a new file `recipe.model.js` to `src` for our Pirate Model.
+Add a new file `recipe.model.js` to `src` for our Recipe Model.
 
 Require Mongoose in this file, and create a new Schema object:
 
@@ -225,19 +236,7 @@ Note: to use a different database, simply provide a different connection string 
 const mongoUri = 'mongodb://devereld:dd2345@ds015730.mlab.com:15730/recipes-dd';
 ```
 
-<!-- and wrap your `app.get` method in the url:
-
-```js
-mongoose.connect(mongoUri, (err, database) => {
-    app.get('/', function(req, res) {
-        res.sendFile(__dirname + '/index.html')
-    })
-})
-```
-
-=== -->
-
-and add a reference to our model `const recipeModels = require('./src/recipe.model');`:
+2: Add a reference to our model `const recipeModels = require('./src/recipe.model');`:
 
 ```js
 const express = require('express');
@@ -268,7 +267,7 @@ app.listen(3001);
 console.log('Server running at http://localhost:3001/');
 ```
 
-2: Update `src/recipe.controllers.js` to require Mongoose, so we can create an instance of our Recipe model to work with.
+3: Update `src/recipe.controllers.js` to require Mongoose, so we can create an instance of our Recipe model to work with.
 
 ```js
 const mongoose = require('mongoose');
@@ -298,7 +297,7 @@ exports.update = function () { };
 exports.delete = function () { };
 ```
 
-3: in `pirate.controllers`: update the `findAll()` function to query Mongo with the `find()` data model method.
+4: in `recipe.controllers`: update the `findAll()` function to query Mongo with the `find()` data model method.
 
 ```js
 const mongoose = require('mongoose');
@@ -319,11 +318,11 @@ exports.delete = function () { };
 
 Once Mongoose looks up the data it returns a result set. Use `res.send()` to return the raw results.
 
-Check that the server is still running and then visit the API endpoint for all pirates `localhost:3001/api/recipes`. You'll get JSON data back from the database.
+Check that the server is still running and then visit the API endpoint for all recipes `localhost:3001/api/recipes`. You'll get JSON data back from the database - an empty array `[]`.
 
 ### Importing Data
 
-Manually using mongo CLI:
+You can insert data using the mongo CLI:
 
 ```sh
 $ mongo
@@ -334,6 +333,8 @@ $ mongo
 > db.recipes.insert( { "name": "Toast", "image": "toast.jpg", "description": "Tasty!" } )
 > db.recipes.find()
 ```
+
+Here is a [quick reference](https://docs.mongodb.com/manual/reference/mongo-shell/) to mongo shell commands.
 
 Rather than use the Mongo command-line to insert entries into our collection, let's import recipe data with our REST API. Add a new route endpoint to `recipe.routes.js`.
 
@@ -435,15 +436,15 @@ e.g. `http://localhost:3001/api/recipes/5ada037e7e9b14543f33ebbf`
 
 #### Add a Recipe
 
-We used create() for our import function to add multiple documents to our Pirates Mongo collection. Our POST handler uses the same method to add a single Pirate to the collection. Once added, the response is the full new Pirate's JSON object.
+We used create() for our import function to add multiple documents to our Recipes Mongo collection. Our POST handler uses the same method to add a single Recipe to the collection. Once added, the response is the full new Recipe's JSON object.
 
 `recipe-controllers.js`:
 
 ```js
 exports.add = function (req, res) {
-    Recipe.create(req.body, function (err, pirate) {
+    Recipe.create(req.body, function (err, recipe) {
         if (err) return console.log(err);
-        return res.send(pirate);
+        return res.send(recipe);
     });
 }
 ```
@@ -451,12 +452,14 @@ exports.add = function (req, res) {
 In a new tab - use cURL to POST to the add endpoint with the full Recipe JSON as the request body (making sure to check the URL port and path).
 
 ```bash
-curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "Toast", "image": "toast.jpg", "description":"Tasty!"}' http://localhost:3001/api/recipes
+curl -i -X POST -H 'Content-Type: application/json' -d '{"title": "Toast", "image": "toast.jpg", "description":"Tasty!"}' http://localhost:3001/api/recipes
 ```
 
 ### Introducing Postman
 
 Since modelling endpoints is a common task and few enjoy using curl, most people use a utility such as [Postman](https://www.getpostman.com/).
+
+Download and install it.
 
 Test a GET in postman with `http://localhost:3001/api/recipes/`
 
@@ -464,7 +467,7 @@ Test a GET in postman with `http://localhost:3001/api/recipes/`
 
 1. Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/recipes/`
 1. Choose `raw` in `Body` and set the text type to JSON(application/json)
-1. Set Body to `{"name": "Toast", "image": "toast.jpg", "description":"Postman? Tasty!"}`
+1. Set Body to `{"title": "Toast", "image": "toast.jpg", "description":"Postman? Tasty!"}`
 1. Hit `Send`
 
 Refresh `http://localhost:3001/recipes` to see the new entry at the end.
@@ -487,7 +490,7 @@ exports.delete = function (req, res) {
 Check it out with curl (replacing the id at the end of the URL with a known id from you `api/recipes` endpoint):
 
 ```sh
-curl -i -X DELETE http://localhost:3001/api/recipes/5ada037e7e9b14543f33ebbf
+curl -i -X DELETE http://localhost:3001/api/recipes/5addfa2fbc204c12425d85d4
 ```
 
 Or by a Delete action in Postman.
@@ -500,7 +503,7 @@ Or by a Delete action in Postman.
 
 ## Building a Front End for Our API
 
-Open and examine `index.html`. Note `<html ng-app="recipeApp">` and `<script src="/js/recipe.module.js"></script>`.
+Open and examine `static/index.html`. Note `<html ng-app="recipeApp">` and `<script src="/js/recipe.module.js"></script>`.
 
 Note the `('/')` route in `app.js` to send the index file:
 
@@ -514,13 +517,15 @@ And the static directory for our assets to app.js:
 
 `app.use(express.static('static'))`
 
+Since we are not bundling in this project we will add js files to the static folder.
+
 Create `static/js/recipe.module.js` and add:
 
 ```js
 const app = angular.module('recipeApp', []);
 ```
 
-Let's run a test by pulling in data from our API.
+Let's run a test by using `$http` to pull in data from our API.
 
 ```js
 const app = angular.module('recipeApp', []);
@@ -549,14 +554,6 @@ Edit index.html:
 
 and test.
 
-Refactored controller:
-
-```js
-app.controller('RecipeAppController', ($scope, $http) => {
-    $http.get('/api/recipes').then( (res) => {$scope.recipes = res.data});
-});
-```
-
 ### Deleting a Recipe
 
 Wire up the `deleteRecipe` function with `ng-click`:
@@ -573,7 +570,7 @@ Wire up the `deleteRecipe` function with `ng-click`:
 Add a delete function to the controller in `recipe.module.js`:
 
 ```js
-$scope.deleteRecipe = (pid) => $http.delete('/api/recipes/' + pid);
+$scope.deleteRecipe = (recipeid) => $http.delete('/api/recipes/' + recipeid);
 ```
 
 e.g.:
@@ -584,7 +581,7 @@ const app = angular.module('recipeApp', []);
 app.controller('RecipeAppController', ($scope, $http) => {
   $http.get('/api/recipes').then( (res) => {$scope.recipes = res.data});
 
-  $scope.deleteRecipe = (pid) => $http.delete('/api/recipes/' + pid);
+  $scope.deleteRecipe = (recipeid) => $http.delete('/api/recipes/' + recipeid);
 
 });
 ```
@@ -604,10 +601,10 @@ Pass the `$index` of the selected recipe to the function:
 
 Add a promise and use the Array method [splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) on the index to update the scope.
 
-Catch the index in the function (`(index, pid)`) and call `then` on it to `splice` the array in scope:
+Catch the index in the function (`(index, recipeid)`) and call `then` on it to `splice` the array in scope:
 
 ```js
-  $scope.deleteRecipe = (index, pid) => $http.delete(`/api/recipes/${pid}`)
+  $scope.deleteRecipe = (index, recipeid) => $http.delete(`/api/recipes/${recipeid}`)
   .then( () => $scope.recipes.splice(index, 1));
 ```
 
@@ -629,11 +626,11 @@ Set up the project preferences:
 }
 ```
 
-Inject `ng-animate` as a dependancy in the module:
+Inject `ng-animate` as a dependency in the module:
 
-`angular.module('pirateApp', ['ngAnimate'])`
+`const app = angular.module('recipeApp', ['ngAnimate']);`
 
-Note the class `fade` on the `li`'s.
+Note the class `fade` on the `li`'s in the html.
 
 Add this css to `_base.css`:
 
@@ -673,7 +670,7 @@ ul li:nth-child(odd) {background: #bada55;}
 }
 ```
 
-Delete all your pirates and navigate to `http://localhost:3001/api/import` to re-import them.
+Delete all your recipes and navigate to `http://localhost:3001/api/import` to re-import them.
 
 Refactor module
 
@@ -683,7 +680,7 @@ Create `js/recipe-list.template.html` from the current contents of the html, e.g
   <h1>Recipe List</h1>
   <ul>
     <li ng-repeat="recipe in recipes">
-        {{ recipe.name }} {{ recipe._id }}
+        {{ recipe.title }} {{ recipe._id }}
         <span ng-click="deleteRecipe($index, recipe._id)">✖︎</span>
     </li>
   </ul>
@@ -702,8 +699,8 @@ app.component('recipeList', {
             $scope.recipes = res.data;
         })
 
-        $scope.deleteRecipe = function(index, pid) {
-            $http.delete('/api/recipes/' + pid)
+        $scope.deleteRecipe = function(index, recipeid) {
+            $http.delete('/api/recipes/' + recipeid)
             .then( () => $scope.recipes.splice(index, 1))
         }
     }
@@ -718,7 +715,7 @@ Feed the component to the view:
 </body>
 ```
 
-#### Update a Recipesss
+#### Update a Recipe
 
 `put` HTTP actions in a REST API correlate to an Update method.
 
@@ -749,17 +746,17 @@ The model's update() takes three parameters:
 
 ### Test with Curl
 
-We will need to construct this line using ids from the pirates listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target pirate:
+We will need to construct this line using ids from the recipes listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target recipe:
 
 ```sh
-curl -i -X PUT -H 'Content-Type: application/json' -d '{"title": "Big Mac"}' http://localhost:3001/api/recipes/5ada0fe0b558ca58bf651405
+curl -i -X PUT -H 'Content-Type: application/json' -d '{"title": "Big Mac"}' http://localhost:3001/api/recipes/5addfeb29fc8b0739881db35
 ```
 
-This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the pirate we want to update.
+This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the recipe we want to update.
 
 Visit the same URL from the cURL request in the browser to see the changes.
 
-PUT actions are cumbersome to test in the browser, so we'll use Postman to run through the process of editing a pirate above.
+PUT actions are cumbersome to test in the browser, so we'll use Postman to run through the process of editing a recipe above.
 
 1: Set the action to put and the url to a single entry with an id.
 
@@ -779,7 +776,7 @@ PUT actions are cumbersome to test in the browser, so we'll use Postman to run t
 <h1>Recipe List</h1>
 <ul>
     <li ng-repeat="recipe in recipes" class="fade">
-        {{ recipe.name }} {{ pirate._id }}
+        {{ recipe.title }} {{ recipe._id }}
         <span ng-click="deleteRecipe($index, recipe._id)">✖︎</span>
     </li>
 </ul>
@@ -788,27 +785,26 @@ PUT actions are cumbersome to test in the browser, so we'll use Postman to run t
     <input type="text" ng-model="recipe.name" required placeholder="Name" />
     <input type="text" ng-model="recipe.title" required placeholder="Title" />
     <input type="text" ng-model="recipe.date" required placeholder="Date" />
-    <input type="text" ng-model="recipe.description" required placeholder="Description" />
+    <textarea type="text" ng-model="recipe.description" required placeholder="Description"></textarea>
     <input type="text" ng-model="recipe.image" required placeholder="Image" />
     <button type="submit">Add Recipe</button>
 </form>
 ```
 
-2: Add to the `recipe.module`:
+2: Add to `recipe.module.js`:
 
 ```js
 $scope.addRecipe = function (data) {
     $http.post('/api/recipes/', data)
         .then( () => {
             $scope.recipes.push(data);
-            $scope.recipe = {};
         })
 };
 ```
 
 3: Test by adding a recipe
 
-Note the lack of an id. Edit the push to use the data returned by the response:
+Note the lack of an id and the persistance of the form elements. Edit the push to use the data returned by the response:
 
 ```js
     $scope.addRecipe = function (data) {
@@ -834,14 +830,13 @@ app.component('recipeList', {
       $scope.recipes = res.data;
     })
 
-    $scope.deleteRecipe = function(index, pid) {
-      $http.delete('/api/recipes/' + pid)
+    $scope.deleteRecipe = function(index, recipeid) {
+      $http.delete('/api/recipes/' + recipeid)
       .then( () => $scope.recipes.splice(index, 1))
     }
     $scope.addRecipe = function (data) {
       $http.post('/api/recipes/', data)
       .then( (res) => {
-          console.log(res.data)
           $scope.recipes.push(res.data);
           $scope.recipe = {};
       })
@@ -886,11 +881,11 @@ Add ng-view to index.html:
 </body>
 ```
 
-Recipe Detail Template
+### Recipe Detail Template
 
-[ng-show / hide](https://docs.angularjs.org/api/ng/directive/ngShow)
+We will allow the user to edit a recipe in the detail view. We will show and hide the editor in the UI using Angular's [ng-show / hide](https://docs.angularjs.org/api/ng/directive/ngShow) function.
 
-`js/recipe-detail.template.html`:
+Create `js/recipe-detail.template.html`:
 
 ```html
 <h1>Recipe Detail View</h1>
@@ -928,7 +923,7 @@ Recipe Detail Template
 <button type="submit" ng-click="$ctrl.back()">Back</button>
 ```
 
-Add a link using the id `href="/recipes/{{ recipe._id }}"` to existing recipe-list template:
+Add a link using the id `href="/recipes/{{ recipe._id }}"` to the existing `recipe-list.template`:
 
 ```html
 <ul>
@@ -954,6 +949,16 @@ app.component('recipeDetail', {
 ```
 
 Test - you should now be able to view the detail template.
+
+Due to routes in `app.js` refreshing a detail page will not work.
+
+We can try the following in `app.js`
+
+```js
+app.get('*', (req, res) => {
+    res.sendFile(__dirname + '/static/index.html');
+});
+```
 
 #### Back button
 
@@ -1030,16 +1035,16 @@ e.g.:
         <input ng-model="$ctrl.recipe._id">
         <input type="submit" value="Save">
     </form>
+    <button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
 </div>
-<button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
 <button type="submit" ng-click="$ctrl.back()">Back</button>
 ```
 
 Update the controller with a save recipe function:
 
 ```js
-this.saveRecipe = (recipe, pid) => {
-    $http.put('/api/recipes/' + pid, recipe)
+this.saveRecipe = (recipe, recipeid) => {
+    $http.put('/api/recipes/' + recipeid, recipe)
     .then((res) => this.editorEnabled = false )
 }
 ```
@@ -1058,12 +1063,16 @@ app.component('recipeDetail', {
     this.editorEnabled = false;
     this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
 
-    this.saveRecipe = (recipe, pid) => {
-      $http.put('/api/recipes/' + pid, recipe)
+    this.saveRecipe = (recipe, recipeid) => {
+      $http.put('/api/recipes/' + recipeid, recipe)
       .then((res) => this.editorEnabled = false )
   }}
 })
 ```
+
+And test.
+
+### Notes
 
 The final recipe.module:
 
@@ -1094,8 +1103,8 @@ app.component('recipeDetail', {
     this.editorEnabled = false;
     this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
 
-    this.saveRecipe = (recipe, pid) => {
-      $http.put('/api/recipes/' + pid, recipe)
+    this.saveRecipe = (recipe, recipeid) => {
+      $http.put('/api/recipes/' + recipeid, recipe)
       .then((res) => this.editorEnabled = false )
   }
 
@@ -1110,8 +1119,8 @@ app.component('recipeList', {
       $scope.recipes = res.data;
     })
 
-    $scope.deleteRecipe = function(index, pid) {
-      $http.delete('/api/recipes/' + pid)
+    $scope.deleteRecipe = function(index, recipeid) {
+      $http.delete('/api/recipes/' + recipeid)
       .then( () => $scope.recipes.splice(index, 1))
     }
 
@@ -1159,8 +1168,8 @@ The final `recipe-detail.template`:
         <input ng-model="$ctrl.recipe._id">
         <input type="submit" value="Save">
     </form>
+    <button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
 </div>
-<button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
 <button type="submit" ng-click="$ctrl.back()">Back</button>
 ```
 
