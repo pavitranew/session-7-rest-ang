@@ -103,42 +103,4 @@ li span {
   float: right;
   cursor: pointer;
 }
-
-.odd {
-  background: #bada55;
-}
-
-.fade.ng-enter {
-  animation: 2s appear;
-}
-
-.fade.ng-leave {
-  animation: 0.5s disappear;
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateX(-200px);
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes disappear {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    font-size: 1.5rem;
-  }
-  75% {
-    color: green;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-}
 /*# sourceMappingURL=styles.css.map */
