@@ -2,8 +2,17 @@
 
 ## Homework
 
-1. prepare your midterm - use with files from session 6, add an api for recipes that displays a summary on the master view and recipes on the detail view.
-1. install the [Angular generator](https://github.com/angular/angular-cli)
+Prepare your midterm
+
+1. use the files from session 6 for your view
+1. following the steps in session 7, add an api for recipes that displays a summary of recipes in the master view
+1. display individual recipes in the detail view
+
+Be sure to pay attention to the navigation.
+
+Bonus - build out a reviews section using the same techniques as above and the restaurant images in session 6's image folder.
+
+For next class, install the [Angular generator](https://github.com/angular/angular-cli)
 
 On a mac: `sudo npm install -g @angular/cli`
 
