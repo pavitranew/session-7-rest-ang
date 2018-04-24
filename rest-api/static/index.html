@@ -12,7 +12,13 @@
 
 </head>
 
-<body>
-	<h1>test</h1>
+<body ng-controller="RecipeAppController">
+	<h1>Recipe List</h1>
+	<ul>
+    <li ng-repeat="recipe in recipes" class="fade">
+        {{ recipe.title }} | {{ recipe._id }}
+        <span ng-click="deleteRecipe($index, recipe._id)">✖︎</span>
+    </li>
+</ul>
 </body>
 </html>
