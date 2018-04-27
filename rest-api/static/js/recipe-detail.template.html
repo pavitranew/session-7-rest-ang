@@ -1,0 +1,35 @@
+<h1>Recipe Detail View</h1>
+<div ng-hide="$ctrl.editorEnabled">
+    <dl>
+        <dt>Title</dt>
+        <dd>{{ $ctrl.recipe.title }}</dd>
+        <dt>Date</dt>
+        <dd>{{ $ctrl.recipe.date }}</dd>
+        <dt>Description</dt>
+        <dd>{{ $ctrl.recipe.description }}</dd>
+        <dt>Image</dt>
+        <dd>{{ $ctrl.recipe.image }}</dd>
+        <dt>ID</dt>
+        <dd>{{ $ctrl.recipe._id }}</dd>
+    </dl>
+    <button ng-click="$ctrl.toggleEditor($ctrl.recipe)">Edit</button>
+</div>
+
+<div ng-show="$ctrl.editorEnabled">
+    <form ng-submit="$ctrl.saveRecipe($ctrl.recipe, $ctrl.recipe._id)" name="updateRecipe">
+        <label>Title</label>
+        <input ng-model="$ctrl.recipe.title">
+        <label>Date</label>
+        <input ng-model="$ctrl.recipe.date">
+        <label>Description</label>
+        <input ng-model="$ctrl.recipe.description">
+        <label>Image</label>
+        <input ng-model="$ctrl.recipe.image">
+        <label>ID</label>
+        <input ng-model="$ctrl.recipe._id">
+        <input type="submit" value="Save">
+    </form>
+    <button type="cancel" ng-click="$ctrl.toggleEditor()">Cancel</button>
+</div>
+
+<button type="submit" ng-click="$ctrl.back()">Back</button>

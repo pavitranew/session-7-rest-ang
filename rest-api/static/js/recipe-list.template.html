@@ -1,0 +1,16 @@
+<h1>Recipe List</h1>
+<ul>
+    <li ng-repeat="recipe in recipes" class="fade">
+        <a href="/recipes/{{ recipe._id }}">{{ recipe.title }} / {{ recipe._id }}</a>
+        <span ng-click="deleteRecipe($index, recipe._id)">✖︎</span>
+    </li>
+  </ul>
+
+<form ng-submit="addRecipe(recipe)">
+    <input type="text" ng-model="recipe.name" required placeholder="Name" />
+    <input type="text" ng-model="recipe.title" required placeholder="Title" />
+    <input type="text" ng-model="recipe.date" required placeholder="Date" />
+    <textarea type="text" ng-model="recipe.description" required placeholder="Description"></textarea>
+    <input type="text" ng-model="recipe.image" required placeholder="Image" />
+    <button type="submit">Add Recipe</button>
+</form>

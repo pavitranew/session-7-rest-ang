@@ -56,12 +56,12 @@ Create `app.js` for express at the top level of the `rest-api` folder:
 ```js
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 // make sure this line always appears before any routes
 app.use(bodyParser.json());
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     res.send('Ahoy there');
 });
 
@@ -84,17 +84,18 @@ An api route is a predefined URL path that our API responds to, e.g.:
 ```js
 app.get('/api/recipes', findAll);
 
-function findAll(req, res){
-    res.send(
-        [{
-            "name": "recipe1309",
-            "title": "Lasagna",
-            "date": "2013-09-01",
-            "description": "Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.",
-            "image": "lasagne.png"
-        }]
-        )
-};
+function findAll(req, res) {
+    res.send([
+        {
+            name: 'recipe1309',
+            title: 'Lasagna',
+            date: '2013-09-01',
+            description:
+                'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
+            image: 'lasagne.png'
+        }
+    ]);
+}
 ```
 
 For better organization (at the cost of a bit of complexity) we will create separate modules for our routes and their associated controllers in a new `src` directory.
@@ -110,7 +111,7 @@ const recipeRoutes = function(app) {
     app.post('/api/recipes', recipes.add);
     app.put('/api/recipes/:id', recipes.update);
     app.delete('/api/recipes/:id', recipes.delete);
-}
+};
 
 module.exports = recipeRoutes;
 ```
@@ -136,11 +137,11 @@ Create a new file inside of `src` called `recipe.controllers.js`. We'll add each
 The are just empty functions for the moment.
 
 ```js
-exports.findAll = function () { };
-exports.findById = function () { };
-exports.add = function () { };
-exports.update = function () { };
-exports.delete = function () { };
+exports.findAll = function() {};
+exports.findById = function() {};
+exports.add = function() {};
+exports.update = function() {};
+exports.delete = function() {};
 ```
 
 ### Check if its working
@@ -152,7 +153,7 @@ NOTE: we are also creating the appRoutes variable to call the function in recipe
 ```js
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 // make sure this line always appears before any routes
 app.use(bodyParser.json());
@@ -160,8 +161,7 @@ app.use(bodyParser.json());
 const routes = require('./src/recipe.routes');
 const appRoutes = routes(app);
 
-
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     res.send('Ahoy there');
 });
 
@@ -172,16 +172,17 @@ console.log('Server running at http://localhost:3001/');
 2: Update findAll's definition in `recipe.controllers.js` to send a json snippet:
 
 ```js
-exports.findAll = function (req, res) {
-  res.send(
-    [{
-        "name": "recipe1309",
-        "title": "Lasagna",
-        "date": "2013-09-01",
-        "description": "Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.",
-        "image": "lasagne.png"
-    }]
-    )
+exports.findAll = function(req, res) {
+    res.send([
+        {
+            name: 'recipe1309',
+            title: 'Lasagna',
+            date: '2013-09-01',
+            description:
+                'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
+            image: 'lasagne.png'
+        }
+    ]);
 };
 ```
 
@@ -241,7 +242,7 @@ const mongoUri = 'mongodb://devereld:dd2345@ds015730.mlab.com:15730/recipes-dd';
 ```js
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
 // const mongoUri = 'mongodb://localhost/rest-api';
@@ -258,8 +259,7 @@ const recipeModels = require('./src/recipe.model');
 const routes = require('./src/recipe.routes');
 const appRoutes = routes(app);
 
-
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     res.send('Ahoy there');
 });
 
@@ -280,21 +280,22 @@ At the top of the script. e.g.:
 const mongoose = require('mongoose');
 const Recipe = mongoose.model('Recipe');
 
-exports.findAll = function(req, res){
-    res.send(
-    [{
-        "name": "recipe1309",
-        "title": "Lasagna",
-        "date": "2013-09-01",
-        "description": "Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.",
-        "image": "lasagne.png"
-    }]
-    )
+exports.findAll = function(req, res) {
+    res.send([
+        {
+            name: 'recipe1309',
+            title: 'Lasagna',
+            date: '2013-09-01',
+            description:
+                'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
+            image: 'lasagne.png'
+        }
+    ]);
 };
-exports.findById = function () { };
-exports.add = function () { };
-exports.update = function () { };
-exports.delete = function () { };
+exports.findById = function() {};
+exports.add = function() {};
+exports.update = function() {};
+exports.delete = function() {};
 ```
 
 4: in `recipe.controllers`: update the `findAll()` function to query Mongo with the `find()` data model method.
@@ -303,15 +304,15 @@ exports.delete = function () { };
 const mongoose = require('mongoose');
 const Recipe = mongoose.model('Recipe');
 
-exports.findAll = function (req, res) {
-    Recipe.find({}, function (err, results) {
+exports.findAll = function(req, res) {
+    Recipe.find({}, function(err, results) {
         return res.send(results);
     });
 };
-exports.findById = function () { };
-exports.add = function () { };
-exports.update = function () { };
-exports.delete = function () { };
+exports.findById = function() {};
+exports.add = function() {};
+exports.update = function() {};
+exports.delete = function() {};
 ```
 
 `find()` is a [mongoose method](https://docs.mongodb.com/manual/reference/method/js-collection/). Passing `find(){}` means we are not filtering data by any of its properties and so to return all of it.
@@ -357,7 +358,7 @@ const recipeRoutes = function(app) {
     app.delete('/api/recipes/:id', recipes.delete);
 
     app.get('/api/import', recipes.import);
-}
+};
 
 module.exports = recipeRoutes;
 ```
@@ -365,43 +366,48 @@ module.exports = recipeRoutes;
 2: define the import method in our controller `recipe.controllers.js`:
 
 ```js
-exports.import = function (req, res) {
+exports.import = function(req, res) {
     // Recipe below refers to the mongoose schema. create() is a mongoose method
     Recipe.create(
-    {
-    "name": "recipe1309",
-    "title": "Lasagna",
-    "date": "2013-09-01",
-    "description": "Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.",
-    "image": "lasagne.png"
-  },
-  {
-    "name": "recipe1404",
-    "title": "Pho-Chicken Noodle Soup",
-    "date": "2014-04-15",
-    "description": "Pho (pronounced \"fuh\") is the most popular food in Vietnam, often eaten for breakfast, lunch and dinner. It is made from a special broth that simmers for several hours infused with exotic spices and served over rice noodles with fresh herbs.",
-    "image": "pho.png"
-  },
+        {
+            name: 'recipe1309',
+            title: 'Lasagna',
+            date: '2013-09-01',
+            description:
+                'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
+            image: 'lasagne.png'
+        },
+        {
+            name: 'recipe1404',
+            title: 'Pho-Chicken Noodle Soup',
+            date: '2014-04-15',
+            description:
+                'Pho (pronounced "fuh") is the most popular food in Vietnam, often eaten for breakfast, lunch and dinner. It is made from a special broth that simmers for several hours infused with exotic spices and served over rice noodles with fresh herbs.',
+            image: 'pho.png'
+        },
 
-  {
-    "name": "recipe1210",
-    "title": "Guacamole",
-    "date": "2016-10-01",
-    "description": "Guacamole is definitely a staple of Mexican cuisine. Even though Guacamole is pretty simple, it can be tough to get the perfect flavor - with this authentic Mexican guacamole recipe, though, you will be an expert in no time.",
-    "image": "guacamole.png"
-  },
+        {
+            name: 'recipe1210',
+            title: 'Guacamole',
+            date: '2016-10-01',
+            description:
+                'Guacamole is definitely a staple of Mexican cuisine. Even though Guacamole is pretty simple, it can be tough to get the perfect flavor - with this authentic Mexican guacamole recipe, though, you will be an expert in no time.',
+            image: 'guacamole.png'
+        },
 
-  {
-    "name": "recipe1810",
-    "title": "Hamburger",
-    "date": "2012-10-20",
-    "description": "A Hamburger (often called a burger) is a type of sandwich in the form of  rounded bread sliced in half with its center filled with a patty which is usually ground beef, then topped with vegetables such as lettuce, tomatoes and onions.",
-    "image": "hamburger.png"
-  }
-        , function (err) {
+        {
+            name: 'recipe1810',
+            title: 'Hamburger',
+            date: '2012-10-20',
+            description:
+                'A Hamburger (often called a burger) is a type of sandwich in the form of  rounded bread sliced in half with its center filled with a patty which is usually ground beef, then topped with vegetables such as lettuce, tomatoes and onions.',
+            image: 'hamburger.png'
+        },
+        function(err) {
             if (err) return console.log(err);
             return res.send(202);
-        });
+        }
+    );
 };
 ```
 
@@ -420,9 +426,9 @@ Recall our route for getting an entry by id: `app.get('/recipes/:id', recipes.fi
 Add the handler method to `recipe.controllers.js`:
 
 ```js
-exports.findById = function (req, res) {
+exports.findById = function(req, res) {
     const id = req.params.id;
-    Recipe.findOne({ '_id': id }, function (err, result) {
+    Recipe.findOne({ _id: id }, function(err, result) {
         return res.send(result);
     });
 };
@@ -441,12 +447,12 @@ We used create() for our import function to add multiple documents to our Recipe
 `recipe-controllers.js`:
 
 ```js
-exports.add = function (req, res) {
-    Recipe.create(req.body, function (err, recipe) {
+exports.add = function(req, res) {
+    Recipe.create(req.body, function(err, recipe) {
         if (err) return console.log(err);
         return res.send(recipe);
     });
-}
+};
 ```
 
 In a new tab - use cURL to POST to the add endpoint with the full Recipe JSON as the request body (making sure to check the URL port and path).
@@ -479,9 +485,9 @@ Save your query in Postman to a new collection.
 Our next REST endpoint, delete, reuses what we've done above. Add this to `recipe.controllers.js`.
 
 ```js
-exports.delete = function (req, res) {
+exports.delete = function(req, res) {
     let id = req.params.id;
-    Recipe.remove({ '_id': id }, function (result) {
+    Recipe.remove({ _id: id }, function(result) {
         return res.send(result);
     });
 };
@@ -509,8 +515,8 @@ Note the `('/')` route in `app.js` to send the index file:
 
 ```js
 app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html')
-})
+    res.sendFile(__dirname + '/index.html');
+});
 ```
 
 And the static directory for our assets to app.js:
@@ -530,9 +536,8 @@ Let's run a test by using `$http` to pull in data from our API.
 ```js
 const app = angular.module('recipeApp', []);
 
-app.controller('RecipeAppController', function ($scope, $http) {
-    $http.get('/api/recipes')
-    .then( (res) => {
+app.controller('RecipeAppController', function($scope, $http) {
+    $http.get('/api/recipes').then(res => {
         $scope.recipes = res.data;
     });
 });
@@ -570,7 +575,7 @@ Wire up the `deleteRecipe` function with `ng-click`:
 Add a delete function to the controller in `recipe.module.js`:
 
 ```js
-$scope.deleteRecipe = (recipeid) => $http.delete('/api/recipes/' + recipeid);
+$scope.deleteRecipe = recipeid => $http.delete('/api/recipes/' + recipeid);
 ```
 
 e.g.:
@@ -579,10 +584,11 @@ e.g.:
 const app = angular.module('recipeApp', []);
 
 app.controller('RecipeAppController', ($scope, $http) => {
-  $http.get('/api/recipes').then( (res) => {$scope.recipes = res.data});
+    $http.get('/api/recipes').then(res => {
+        $scope.recipes = res.data;
+    });
 
-  $scope.deleteRecipe = (recipeid) => $http.delete('/api/recipes/' + recipeid);
-
+    $scope.deleteRecipe = recipeid => $http.delete('/api/recipes/' + recipeid);
 });
 ```
 
@@ -604,8 +610,8 @@ Add a promise and use the Array method [splice](https://developer.mozilla.org/en
 Catch the index in the function (`(index, recipeid)`) and call `then` on it to `splice` the array in scope:
 
 ```js
-  $scope.deleteRecipe = (index, recipeid) => $http.delete(`/api/recipes/${recipeid}`)
-  .then( () => $scope.recipes.splice(index, 1));
+$scope.deleteRecipe = (index, recipeid) =>
+    $http.delete(`/api/recipes/${recipeid}`).then(() => $scope.recipes.splice(index, 1));
 ```
 
 Changes to the db persist and are relected in the view.
@@ -635,23 +641,25 @@ Note the class `fade` on the `li`'s in the html.
 Add this css to `_base.css`:
 
 ```css
-ul li:nth-child(odd) {background: #bada55;}
+ul li:nth-child(odd) {
+    background: #bada55;
+}
 
 .fade.ng-enter {
-  animation: 2s appear;
+    animation: 2s appear;
 }
 .fade.ng-leave {
-  animation: 0.5s disappear;
+    animation: 0.5s disappear;
 }
 
 @keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateX(-200px);
-  }
-  to {
-    opacity: 1;
-  }
+    from {
+        opacity: 0;
+        transform: translateX(-200px);
+    }
+    to {
+        opacity: 1;
+    }
 }
 @keyframes disappear {
     0% {
@@ -693,18 +701,16 @@ const app = angular.module('recipeApp', ['ngAnimate']);
 
 app.component('recipeList', {
     templateUrl: '/js/recipe-list.template.html',
-    controller: function RecipeAppController($http, $scope){
-        $http.get('/api/recipes').
-        then( (res) => {
+    controller: function RecipeAppController($http, $scope) {
+        $http.get('/api/recipes').then(res => {
             $scope.recipes = res.data;
-        })
+        });
 
         $scope.deleteRecipe = function(index, recipeid) {
-            $http.delete('/api/recipes/' + recipeid)
-            .then( () => $scope.recipes.splice(index, 1))
-        }
+            $http.delete('/api/recipes/' + recipeid).then(() => $scope.recipes.splice(index, 1));
+        };
     }
-})
+});
 ```
 
 Feed the component to the view:
@@ -715,24 +721,29 @@ Feed the component to the view:
 </body>
 ```
 
+Aside - custom tags and the shadow DOM
+
+1. Add `<video controls></video>` to the document
+1. Enable shadow dom in the developer tools settings
+1. Inspect the video tag
+
 #### Update a Recipe
 
 `put` HTTP actions in a REST API correlate to an Update method.
 
-The route for Update also uses an :id parameter.
+The route for Update also uses an `:id` parameter.
 
 In `recipe.controllers.js`:
 
 ```js
-exports.update = function (req, res) {
+exports.update = function(req, res) {
     const id = req.params.id;
     const updates = req.body;
 
-    Recipe.update({ '_id': id }, updates,
-        function (err) {
-            if (err) return console.log(err);
-            return res.sendStatus(202);
-        });
+    Recipe.update({ _id: id }, updates, function(err) {
+        if (err) return console.log(err);
+        return res.sendStatus(202);
+    });
 };
 ```
 
@@ -748,8 +759,10 @@ The model's update() takes three parameters:
 
 We will need to construct this line using ids from the recipes listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target recipe:
 
+(Check the below for proper URL - it changes depending on the port in use as well as the id.)
+
 ```sh
-curl -i -X PUT -H 'Content-Type: application/json' -d '{"title": "Big Mac"}' http://localhost:3001/api/recipes/5addfeb29fc8b0739881db35
+curl -i -X PUT -H 'Content-Type: application/json' -d '{"title": "Big Mac"}' http://localhost:3010/api/recipes/5ada0fe0b558ca58bf651406
 ```
 
 This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the recipe we want to update.
@@ -770,7 +783,7 @@ PUT actions are cumbersome to test in the browser, so we'll use Postman to run t
 
 ### Add Recipe
 
-1: Add a form to the template:
+1: Add a form to the recipe-list template:
 
 ```html
 <h1>Recipe List</h1>
@@ -794,12 +807,35 @@ PUT actions are cumbersome to test in the browser, so we'll use Postman to run t
 2: Add to `recipe.module.js`:
 
 ```js
-$scope.addRecipe = function (data) {
-    $http.post('/api/recipes/', data)
-        .then( () => {
-            $scope.recipes.push(data);
-        })
+$scope.addRecipe = function(data) {
+    $http.post('/api/recipes/', data).then(() => {
+        $scope.recipes.push(data);
+    });
 };
+```
+
+e.g.:
+
+```js
+const app = angular.module('recipeApp', ['ngAnimate']);
+
+app.component('recipeList', {
+    templateUrl: '/js/recipe-list.template.html',
+    controller: function RecipeAppController($http, $scope) {
+        $http.get('/api/recipes').then(res => {
+            $scope.recipes = res.data;
+        });
+
+        $scope.deleteRecipe = (index, recipeid) =>
+            $http.delete('/api/recipes/' + recipeid).then(() => $scope.recipes.splice(index, 1));
+
+        $scope.addRecipe = function(data) {
+            $http.post('/api/recipes/', data).then(() => {
+                $scope.recipes.push(data);
+            });
+        };
+    }
+});
 ```
 
 3: Test by adding a recipe
@@ -807,14 +843,13 @@ $scope.addRecipe = function (data) {
 Note the lack of an id and the persistance of the form elements. Edit the push to use the data returned by the response:
 
 ```js
-    $scope.addRecipe = function (data) {
-      $http.post('/api/recipes/', data)
-      .then( (res) => {
-          console.log(res.data)
-          $scope.recipes.push(res.data);
-          $scope.recipe = {};
-      })
-  };
+$scope.addRecipe = function(data) {
+    $http.post('/api/recipes/', data).then(res => {
+        console.log(res.data);
+        $scope.recipes.push(res.data);
+        $scope.recipe = {};
+    });
+};
 ```
 
 The complete component:
@@ -823,50 +858,47 @@ The complete component:
 const app = angular.module('recipeApp', ['ngAnimate']);
 
 app.component('recipeList', {
-  templateUrl: '/js/recipe-list.template.html',
-  controller: function RecipeAppController($http, $scope){
-    $http.get('/api/recipes').
-    then( (res) => {
-      $scope.recipes = res.data;
-    })
+    templateUrl: '/js/recipe-list.template.html',
+    controller: function RecipeAppController($http, $scope) {
+        $http.get('/api/recipes').then(res => {
+            $scope.recipes = res.data;
+        });
 
-    $scope.deleteRecipe = function(index, recipeid) {
-      $http.delete('/api/recipes/' + recipeid)
-      .then( () => $scope.recipes.splice(index, 1))
+        $scope.deleteRecipe = function(index, recipeid) {
+            $http.delete('/api/recipes/' + recipeid).then(() => $scope.recipes.splice(index, 1));
+        };
+        $scope.addRecipe = function(data) {
+            $http.post('/api/recipes/', data).then(res => {
+                $scope.recipes.push(res.data);
+                $scope.recipe = {};
+            });
+        };
     }
-    $scope.addRecipe = function (data) {
-      $http.post('/api/recipes/', data)
-      .then( (res) => {
-          $scope.recipes.push(res.data);
-          $scope.recipe = {};
-      })
-  };
-  }
-})
+});
 ```
 
 ### Create a detail view
 
-Inject ngRoute
+Inject `ngRoute` into the module:
 
 ```js
 const app = angular.module('recipeApp', ['ngAnimate', 'ngRoute']);
 ```
 
-Add Routing
+Add Routing to the module:
 
 ```js
 app.config(function config($locationProvider, $routeProvider) {
-  $routeProvider.
-    when('/', {
-        template: '<recipe-list></recipe-list>'
-    }).
-    when('/recipes/:recipeId', {
-        template: '<recipe-detail></recipe-detail>'
-    }).
-    otherwise('/');
+    $routeProvider
+        .when('/', {
+            template: '<recipe-list></recipe-list>'
+        })
+        .when('/recipes/:recipeId', {
+            template: '<recipe-detail></recipe-detail>'
+        })
+        .otherwise('/');
     $locationProvider.html5Mode(true);
-  });
+});
 ```
 
 Add in the head of index.html:
@@ -904,6 +936,7 @@ Create `js/recipe-detail.template.html`:
     </dl>
     <button ng-click="$ctrl.toggleEditor($ctrl.recipe)">Edit</button>
 </div>
+
 <div ng-show="$ctrl.editorEnabled">
     <form ng-submit="$ctrl.saveRecipe($ctrl.recipe, $ctrl.recipe._id)" name="updateRecipe">
         <label>Title</label>
@@ -934,21 +967,20 @@ Add a link using the id `href="/recipes/{{ recipe._id }}"` to the existing `reci
 </ul>
 ```
 
-2: Create a `recipeDetail` component.
+2: Create a `recipeDetail` component in the module.
 
 Use $http.get and $routeParams to grab the info from our api route:
 
 ```js
 app.component('recipeDetail', {
-  templateUrl: '/js/recipe-detail.template.html',
-  controller:  function RecipeDetailController($http, $routeParams) {
-      $http.get('/api/recipes/' + $routeParams.recipeId)
-      .then((response) => this.recipe = response.data);
-  }
-})
+    templateUrl: '/js/recipe-detail.template.html',
+    controller: function RecipeDetailController($http, $routeParams) {
+        $http.get('/api/recipes/' + $routeParams.recipeId).then(response => (this.recipe = response.data));
+    }
+});
 ```
 
-Test - you should now be able to view the detail template.
+Test by clicking on one of the links - you should now be able to view the detail template.
 
 Due to routes in `app.js` refreshing a detail page will not work.
 
@@ -972,14 +1004,13 @@ e.g.:
 
 ```js
 app.component('recipeDetail', {
-  templateUrl: '/js/recipe-detail.template.html',
-  controller:  function RecipeDetailController($http, $routeParams) {
-      $http.get('/api/recipes/' + $routeParams.recipeId)
-      .then((response) => this.recipe = response.data);
+    templateUrl: '/js/recipe-detail.template.html',
+    controller: function RecipeDetailController($http, $routeParams) {
+        $http.get('/api/recipes/' + $routeParams.recipeId).then(response => (this.recipe = response.data));
 
-      this.back = () => window.history.back();
-  }
-})
+        this.back = () => window.history.back();
+    }
+});
 ```
 
 #### Edit Button
@@ -988,27 +1019,26 @@ Toggling the editor interface:
 
 ```js
 this.editorEnabled = false;
-this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
+this.toggleEditor = () => (this.editorEnabled = !this.editorEnabled);
 ```
 
 e.g.:
 
 ```js
 app.component('recipeDetail', {
-  templateUrl: '/js/recipe-detail.template.html',
-  controller:  function RecipeDetailController($http, $routeParams) {
-      $http.get('/api/recipes/' + $routeParams.recipeId)
-      .then((response) => this.recipe = response.data);
+    templateUrl: '/js/recipe-detail.template.html',
+    controller: function RecipeDetailController($http, $routeParams) {
+        $http.get('/api/recipes/' + $routeParams.recipeId).then(response => (this.recipe = response.data));
 
-    this.back = () => window.history.back();
+        this.back = () => window.history.back();
 
-    this.editorEnabled = false;
-    this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
-  }
-})
+        this.editorEnabled = false;
+        this.toggleEditor = () => (this.editorEnabled = !this.editorEnabled);
+    }
+});
 ```
 
-Test this by changing the value to true:
+Test this by changing the default value to true:
 
 `this.editorEnabled = true;`
 
@@ -1040,34 +1070,32 @@ e.g.:
 <button type="submit" ng-click="$ctrl.back()">Back</button>
 ```
 
-Update the controller with a save recipe function:
+Update the recipe detail controller with a save recipe function:
 
 ```js
 this.saveRecipe = (recipe, recipeid) => {
-    $http.put('/api/recipes/' + recipeid, recipe)
-    .then((res) => this.editorEnabled = false )
-}
+    $http.put('/api/recipes/' + recipeid, recipe).then(res => (this.editorEnabled = false));
+};
 ```
 
 e.g.:
 
 ```js
 app.component('recipeDetail', {
-  templateUrl: '/js/recipe-detail.template.html',
-  controller:  function RecipeDetailController($http, $routeParams) {
-      $http.get('/api/recipes/' + $routeParams.recipeId)
-      .then((response) => this.recipe = response.data);
+    templateUrl: '/js/recipe-detail.template.html',
+    controller: function RecipeDetailController($http, $routeParams) {
+        $http.get('/api/recipes/' + $routeParams.recipeId).then(response => (this.recipe = response.data));
 
-    this.back = () => window.history.back();
+        this.back = () => window.history.back();
 
-    this.editorEnabled = false;
-    this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
+        this.editorEnabled = false;
+        this.toggleEditor = () => (this.editorEnabled = !this.editorEnabled);
 
-    this.saveRecipe = (recipe, recipeid) => {
-      $http.put('/api/recipes/' + recipeid, recipe)
-      .then((res) => this.editorEnabled = false )
-  }}
-})
+        this.saveRecipe = (recipe, recipeid) => {
+            $http.put('/api/recipes/' + recipeid, recipe).then(res => (this.editorEnabled = false));
+        };
+    }
+});
 ```
 
 And test.
@@ -1080,59 +1108,52 @@ The final recipe.module:
 const app = angular.module('recipeApp', ['ngAnimate', 'ngRoute']);
 
 app.config(function config($locationProvider, $routeProvider) {
-  $routeProvider.
-    when('/', {
-        template: '<recipe-list></recipe-list>'
-    }).
-    when('/recipes/:recipeId', {
-        template: '<recipe-detail></recipe-detail>'
-    }).
-    otherwise('/');
+    $routeProvider
+        .when('/', {
+            template: '<recipe-list></recipe-list>'
+        })
+        .when('/recipes/:recipeId', {
+            template: '<recipe-detail></recipe-detail>'
+        })
+        .otherwise('/');
     $locationProvider.html5Mode(true);
-  }
-);
+});
 
 app.component('recipeDetail', {
-  templateUrl: '/js/recipe-detail.template.html',
-  controller:  function RecipeDetailController($http, $routeParams) {
-      $http.get('/api/recipes/' + $routeParams.recipeId)
-      .then((response) => this.recipe = response.data);
+    templateUrl: '/js/recipe-detail.template.html',
+    controller: function RecipeDetailController($http, $routeParams) {
+        $http.get('/api/recipes/' + $routeParams.recipeId).then(response => (this.recipe = response.data));
 
-    this.back = () => window.history.back();
+        this.back = () => window.history.back();
 
-    this.editorEnabled = false;
-    this.toggleEditor = () => this.editorEnabled = !this.editorEnabled;
+        this.editorEnabled = false;
+        this.toggleEditor = () => (this.editorEnabled = !this.editorEnabled);
 
-    this.saveRecipe = (recipe, recipeid) => {
-      $http.put('/api/recipes/' + recipeid, recipe)
-      .then((res) => this.editorEnabled = false )
-  }
-
-  }
-})
+        this.saveRecipe = (recipe, recipeid) => {
+            $http.put('/api/recipes/' + recipeid, recipe).then(res => (this.editorEnabled = false));
+        };
+    }
+});
 
 app.component('recipeList', {
-  templateUrl: '/js/recipe-list.template.html',
-  controller: function RecipeAppController($http, $scope){
-    $http.get('/api/recipes').
-    then( (res) => {
-      $scope.recipes = res.data;
-    })
+    templateUrl: '/js/recipe-list.template.html',
+    controller: function RecipeAppController($http, $scope) {
+        $http.get('/api/recipes').then(res => {
+            $scope.recipes = res.data;
+        });
 
-    $scope.deleteRecipe = function(index, recipeid) {
-      $http.delete('/api/recipes/' + recipeid)
-      .then( () => $scope.recipes.splice(index, 1))
+        $scope.deleteRecipe = function(index, recipeid) {
+            $http.delete('/api/recipes/' + recipeid).then(() => $scope.recipes.splice(index, 1));
+        };
+
+        $scope.addRecipe = function(data) {
+            $http.post('/api/recipes/', data).then(res => {
+                $scope.recipes.push(res.data);
+                $scope.recipe = {};
+            });
+        };
     }
-
-    $scope.addRecipe = function (data) {
-      $http.post('/api/recipes/', data)
-      .then( (res) => {
-          $scope.recipes.push(res.data);
-          $scope.recipe = {};
-      })
-  };
-  }
-})
+});
 ```
 
 The final `recipe-detail.template`:
