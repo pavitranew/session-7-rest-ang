@@ -35,30 +35,28 @@ function dump(){
 
 // CONTENT
 
-// 1 build the navbar dynamically from database
-
-fetchLab( (content) => {
-  const markup =
-  `<ul>
-  ${content.map(
-    listItem => `<li><a href="#${listItem._id.$oid}">${listItem.title}</a></li>`
-  ).join('')}
-  </ul>`;
-  navbar.innerHTML = markup;
-})
-
 // 2 set the content when the user navigates
 
 function init() {
   // let newloc = location.hash.substr(1);
   fetchLab((content) => {
+
+    const markup =
+    `<ul>
+    ${content.map(
+      listItem => `<li><a href="#${listItem._id.$oid}">${listItem.title}</a></li>`
+    ).join('')}
+    </ul>`;
+    navbar.innerHTML = markup;
+
+
     let generatedContent = '';
     for (let i = 0; i < content.length; i++){
       generatedContent += `
-        <div>
-        <h2>${content[i].title}</h2>
+        <div class="recipe-preview">
+        <h2><a href="${content[i]._id.$oid}">${content[i].title}</a></h2>
         <img src="/img/recipes/${content[i].image}" />
-        ${content[i].description}<span>X</span> 
+        <p>${content[i].description}<span>X</span></p>
         </div>
         `
     }

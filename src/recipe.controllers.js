@@ -16,9 +16,8 @@ exports.findById = function (req, res) {
 // exports.add = function () { };
 exports.add = function (req, res) {
   Recipe.create(req.body, function (err, recipe) {
-    console.log(req.body)
+    console.log('boo ' + req.body.title)
     if (err) return console.log(err);
-    console.log(recipe)
       return res.send(recipe);
   });
 }

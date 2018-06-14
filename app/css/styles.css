@@ -26,18 +26,6 @@ p {
 img {
   width: 100%; }
 
-.site-wrap {
-  max-width: 90vw;
-  margin: 40px auto;
-  background: white;
-  padding: 20px 20px;
-  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.05);
-  transform: scale(0.98);
-  transition: transform 0.5s; }
-
-body.fixed-nav .site-wrap {
-  transform: scale(1); }
-
 nav {
   background: #007eb6;
   width: 100%;
@@ -109,3 +97,37 @@ header {
     font-size: 7vw;
     font-weight: 400;
     text-shadow: 3px 4px 0 rgba(0, 0, 0, 0.2); }
+
+input, textarea {
+  display: block;
+  margin: 1rem;
+  width: 70%; }
+
+button {
+  padding: 0.5rem;
+  background-color: #00a3d5;
+  color: #fff;
+  margin: 0 1rem; }
+
+.site-wrap {
+  max-width: 90vw;
+  margin: 20px auto;
+  background: white;
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.05);
+  transform: scale(0.98);
+  transition: transform 0.5s; }
+
+.recipe-preview {
+  padding: 1rem;
+  border-bottom: 1rem solid #bada55; }
+  .recipe-preview h2 {
+    margin-bottom: 0.5rem; }
+    .recipe-preview h2 a {
+      color: #00a3d5; }
+  .recipe-preview p {
+    margin: 1rem 0; }
+
+body.fixed-nav .site-wrap {
+  transform: scale(1); }
+
+/*# sourceMappingURL=styles.css.map */

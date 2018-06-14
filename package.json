@@ -4,8 +4,10 @@
   "description": "## Homework",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
-},
+    "sassy": "node-sass --watch \"scss\"  --output \"app/css/\" --source-map true",
+    "start": "nodemon app.js",
+    "boom!": "concurrently \"npm run start\" \"npm run sassy\" "
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/front-end-intermediate/session-7.git"
@@ -19,7 +21,11 @@
   "homepage": "https://github.com/front-end-intermediate/session-7#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "concurrently": "^3.5.1",
     "express": "^4.16.3",
     "mongoose": "^5.1.5"
+  },
+  "devDependencies": {
+    "node-sass": "^4.9.0"
   }
 }

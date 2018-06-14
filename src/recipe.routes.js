@@ -10,3 +10,5 @@ const recipeRoutes = function(app) {
 }
 
 module.exports = recipeRoutes;
+
+// curl -i -X POST -H 'Content-Type: application/json' -d '{"title": "Toast", "image": "lasagna.png", "description":"Tasty!"}' http://localhost:3002/api/recipes
