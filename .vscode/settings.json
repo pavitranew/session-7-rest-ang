@@ -1,9 +1,0 @@
-{
-  "liveSassCompile.settings.formats": [
-    {
-      "savePath": "/rest-api/static/css/",
-      "format": "expanded"
-    }
-  ],
-  "liveSassCompile.settings.excludeList": ["**/node_modules/**", ".vscode/**", "**/other/**"]
-}
