@@ -35,8 +35,6 @@ function dump(){
 
 // CONTENT
 
-// 2 set the content when the user navigates
-
 function init() {
   // let newloc = location.hash.substr(1);
   fetchLab((content) => {
@@ -67,7 +65,8 @@ function init() {
 // NEW function for getting data - uses fetch and promises
 
 function fetchLab(callback) {
-  fetch('https://api.mlab.com/api/1/databases/recipes-dd/collections/recipes?apiKey=oZ92RXFzah01L1xNSWAZWZrm4kn6zF0n')
+  // fetch('https://api.mlab.com/api/1/databases/recipes-dd/collections/recipes?apiKey=oZ92RXFzah01L1xNSWAZWZrm4kn6zF0n')
+  fetch('/api/recipes')
   // .then( res => console.log(res) )
   .then( res => res.json() )
   // .then( res => console.log(res) )
@@ -78,3 +77,29 @@ init();
 
 window.addEventListener('scroll', fixNav);
 // window.addEventListener('hashchange', navigate);
+
+const myform = document.querySelector('form');
+
+myform.addEventListener('submit', () => {
+  event.preventDefault();
+  sendData();
+});
+
+function sendData() {
+  // console.log(this.title.value)
+
+  var XHR = new XMLHttpRequest();
+
+  var FD = new FormData(myform);
+
+  console.log(FD)
+
+  XHR.addEventListener("load", function(event) {
+    alert(event.target.responseText);
+  });
+
+  XHR.open("POST", "/api/recipes");
+
+  XHR.send(FD);
+
+}
