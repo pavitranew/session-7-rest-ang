@@ -78,28 +78,27 @@ init();
 window.addEventListener('scroll', fixNav);
 // window.addEventListener('hashchange', navigate);
 
-const myform = document.querySelector('form');
+// const myform = document.querySelector('form');
 
-myform.addEventListener('submit', () => {
-  event.preventDefault();
-  sendData();
-});
+// myform.addEventListener('submit', () => {
+//   event.preventDefault();
+//   sendData();
+// });
 
-function sendData() {
-  // console.log(this.title.value)
+// function sendData() {
 
-  var XHR = new XMLHttpRequest();
+//   var XHR = new XMLHttpRequest();
 
-  var FD = new FormData(myform);
+//   var FD = new FormData(myform);
 
-  console.log(FD)
+//   console.log(FD)
 
-  XHR.addEventListener("load", function(event) {
-    alert(event.target.responseText);
-  });
+//   XHR.addEventListener("load", function(event) {
+//     alert(event.target.responseText);
+//   });
 
-  XHR.open("POST", "/api/recipes");
+//   XHR.open("POST", "/api/recipes");
 
-  XHR.send(FD);
+//   XHR.send(FD);
 
-}
+// }
