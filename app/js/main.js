@@ -47,19 +47,33 @@ function init() {
     </ul>`;
     navbar.innerHTML = markup;
 
-
     let generatedContent = '';
     for (let i = 0; i < content.length; i++){
       generatedContent += `
         <div class="recipe-preview">
-        <h2><a href="${content[i]._id.$oid}">${content[i].title}</a></h2>
+        <h2><a href="${content[i]._id}">${content[i].title}</a></h2>
         <img src="/img/recipes/${content[i].image}" />
-        <p>${content[i].description}<span>X</span></p>
+        <p>${content[i].description}</p>
+        <span onclick="deleteme('${content[i]._id}')">✖︎</span>
         </div>
         `
     }
     siteWrap.innerHTML = generatedContent;
+
+    const newLinks = document.querySelectorAll('.site-wrap h2 a')
+    console.log(newLinks)
+    newLinks.forEach( link => link.addEventListener('click', detailme) )
   })
+}
+
+function detailme(){
+  // console.log(this.getAttribute('href'))
+  fetch('/api/recipes/' + this.getAttribute('href'), {
+    method: 'get'
+  })
+  .then(res => res.json())
+  .then(res => console.log(res))
+  event.preventDefault();
 }
 
 // NEW function for getting data - uses fetch and promises
@@ -78,27 +92,10 @@ init();
 window.addEventListener('scroll', fixNav);
 // window.addEventListener('hashchange', navigate);
 
-// const myform = document.querySelector('form');
+function deleteme(thingtodelete){
+  fetch('/api/recipes/'+thingtodelete, {
+    method: 'delete'
+  })
+  .then(init())
+}
 
-// myform.addEventListener('submit', () => {
-//   event.preventDefault();
-//   sendData();
-// });
-
-// function sendData() {
-
-//   var XHR = new XMLHttpRequest();
-
-//   var FD = new FormData(myform);
-
-//   console.log(FD)
-
-//   XHR.addEventListener("load", function(event) {
-//     alert(event.target.responseText);
-//   });
-
-//   XHR.open("POST", "/api/recipes");
-
-//   XHR.send(FD);
-
-// }

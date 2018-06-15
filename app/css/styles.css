@@ -98,16 +98,22 @@ header {
     font-weight: 400;
     text-shadow: 3px 4px 0 rgba(0, 0, 0, 0.2); }
 
+form * {
+  font-size: 0.875rem; }
+
 input, textarea {
   display: block;
   margin: 1rem;
-  width: 70%; }
+  width: 90%;
+  padding: 0.25rem; }
 
 button {
   padding: 0.5rem;
   background-color: #00a3d5;
   color: #fff;
-  margin: 0 1rem; }
+  margin: 0 1rem;
+  border-radius: 3px;
+  border: none; }
 
 .site-wrap {
   max-width: 90vw;
