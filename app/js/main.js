@@ -97,5 +97,6 @@ function deleteme(thingtodelete){
     method: 'delete'
   })
   .then(init())
+  .catch( () => console.log("error"))
 }
 

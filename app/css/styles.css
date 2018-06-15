@@ -84,7 +84,7 @@ nav {
 
 header {
   height: 10vh;
-  background: url(../img/img.jpg) center no-repeat;
+  background: #00a3d5;
   background-size: cover;
   display: flex;
   align-items: center;

@@ -4,8 +4,9 @@
   "description": "## Homework",
   "main": "index.js",
   "scripts": {
-    "sassy": "node-sass --watch \"scss\"  --output \"app/css/\" --source-map true",
+    "prestart": "node src/startMessage.js",
     "start": "nodemon app.js",
+    "poststart": "node-sass --watch \"scss\"  --output \"app/css/\" --source-map true",
     "boom!": "concurrently \"npm run start\" \"npm run sassy\" "
   },
   "repository": {
@@ -26,6 +27,7 @@
     "mongoose": "^5.1.5"
   },
   "devDependencies": {
+    "chalk": "^2.4.1",
     "node-sass": "^4.9.0"
   }
 }
